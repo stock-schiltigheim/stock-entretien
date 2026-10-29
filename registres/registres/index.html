@@ -1,0 +1,842 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1B2F4A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Registres">
+<title>Registres de sécurité</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icone-192.png">
+<link rel="apple-touch-icon" href="icone-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Public+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Registres de sécurité — registre administratif : bandeau marine, intercalaires,
+   sommaire lettré A→YZ comme le classeur papier. Téléphone d'abord. */
+:root{
+  --bg:#EEF1F5; --paper:#FFFFFF; --sunk:#F4F6F9; --fg:#141C26; --muted:#5A6676; --line:#D5DBE3;
+  --navy:#1B2F4A; --navy-fg:#FFFFFF; --navy-soft:#E4EAF2; --accent:#1F5F99; --signal:#E3A21A;
+  --t1:#1F5F99; --t2:#2F7A52; --t3:#A26A12;
+  --ok:#22704A; --ok-bg:#E2F1E8; --warn:#8A5A00; --warn-bg:#FCF0D8;
+  --bad:#A3271F; --bad-bg:#F9E1DE; --info:#1F5F99; --info-bg:#E1EBF6; --none:#5A6676; --none-bg:#EDF0F4;
+  --display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --body:"Public Sans","Segoe UI",system-ui,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0F141B; --paper:#171E28; --sunk:#1D2531; --fg:#E6EBF2; --muted:#9AA6B6; --line:#2C3644;
+  --navy:#22385A; --navy-fg:#F1F5FB; --navy-soft:#1F2B3C; --accent:#8FB3DC;
+  --t1:#8FB3DC; --t2:#82C9A2; --t3:#E8B866;
+  --ok:#82C9A2; --ok-bg:#16301F; --warn:#E8B866; --warn-bg:#352812; --bad:#F09A90; --bad-bg:#3A1A17;
+  --info:#8FB3DC; --info-bg:#1D2B3E; --none:#9AA6B6; --none-bg:#222B37; color-scheme:dark}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.5;-webkit-text-size-adjust:100%;padding-bottom:calc(48px + env(safe-area-inset-bottom,0px))}
+.gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:980px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);margin:0;letter-spacing:-.01em;text-wrap:balance}
+.eyebrow{font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--muted)}
+.muted{color:var(--muted)} .small{font-size:.85rem} .num{font-variant-numeric:tabular-nums}
+[hidden]{display:none!important}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:1px solid var(--line);background:var(--paper);border-radius:6px;padding:8px 14px;min-height:42px}
+button:hover{border-color:var(--muted)}
+button:disabled{opacity:.6;cursor:progress}
+button.primary{background:var(--navy);border-color:var(--navy);color:var(--navy-fg);font-weight:600}
+button.link{border:none;background:none;padding:4px 0;min-height:0;color:var(--accent);text-decoration:underline;text-underline-offset:3px}
+button.danger{color:var(--bad)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+input,select,textarea{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:8px 10px;width:100%;min-height:42px;font-size:16px}
+label{display:flex;flex-direction:column;gap:4px;font-size:.8rem;color:var(--muted);font-weight:500;min-width:0}
+a{color:var(--accent)}
+
+/* bandeau */
+.band{background:var(--navy);color:var(--navy-fg);padding-top:calc(16px + env(safe-area-inset-top,0px))}
+.brandrow{display:flex;gap:12px;align-items:center;justify-content:space-between}
+.brand{display:flex;gap:12px;align-items:center;min-width:0}
+.seal{flex:0 0 auto;width:42px;height:42px;border:2px solid var(--navy-fg);border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:.72rem}
+.band .eyebrow{color:var(--navy-fg);opacity:.85}
+.band h1{font-size:1.3rem;font-weight:800;line-height:1.15}
+.who{font-size:.8rem;text-align:right;line-height:1.3}
+@media (max-width:600px){.band .eyebrow{display:none}.band h1{font-size:1.1rem}.seal{width:36px;height:36px;font-size:.62rem}.who{font-size:.74rem}}
+.who button{background:transparent;border:1px solid rgba(255,255,255,.4);color:var(--navy-fg);min-height:32px;padding:3px 10px;font-size:.8rem;margin-top:4px}
+.dividers{display:flex;gap:6px;overflow-x:auto;margin-top:14px;scrollbar-width:none}
+.dividers::-webkit-scrollbar{display:none}
+.dividers a{flex:0 0 auto;border-radius:8px 8px 0 0;background:rgba(255,255,255,.12);color:var(--navy-fg);text-decoration:none;
+  padding:9px 15px 8px;min-height:44px;display:flex;flex-direction:column;line-height:1.2;position:relative}
+.dividers .tn{font-family:var(--display);font-weight:700;font-size:.9rem}
+.dividers .ts{font-size:.7rem;opacity:.85}
+.dividers a[aria-current="page"]{background:var(--bg);color:var(--fg)}
+.dividers a[aria-current="page"] .ts{color:var(--muted);opacity:1}
+.dividers .dot{position:absolute;top:0;left:14px;width:22px;height:4px;border-radius:0 0 3px 3px}
+
+main{display:flex;flex-direction:column;gap:20px;padding-top:20px}
+.paper{background:var(--paper);border:1px solid var(--line);border-radius:10px}
+.notice{padding:12px 14px;border-radius:8px;background:var(--info-bg);color:var(--info);font-size:.9rem}
+.notice.warn{background:var(--warn-bg);color:var(--warn)} .notice.bad{background:var(--bad-bg);color:var(--bad)}
+.empty{padding:26px 16px;text-align:center;color:var(--muted)}
+.loading{padding:40px 16px;text-align:center;color:var(--muted)}
+.sectitle{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.sectitle h2{font-size:1.15rem;font-weight:800}
+.sectitle h3{font-size:1.02rem;font-weight:700}
+h4{margin:0;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.addrow{display:flex;gap:8px} .addrow input{flex:1;min-width:0}
+
+/* page de garde */
+.cover{overflow:hidden}
+.cover-top{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;align-items:flex-end;padding:18px 20px 16px;border-top:6px solid var(--sc,var(--navy))}
+.cover-top h2{font-size:1.4rem;font-weight:800;line-height:1.15;margin-top:3px}
+.seg{display:flex;gap:2px;background:var(--sunk);padding:3px;border-radius:8px;border:1px solid var(--line);flex-wrap:wrap}
+.seg a{border-radius:6px;padding:7px 12px;font-weight:500;text-decoration:none;color:var(--fg);font-size:.9rem}
+@media (max-width:600px){.cover-top{flex-direction:column;align-items:stretch}.seg{display:grid;grid-template-columns:repeat(3,1fr)}.seg a{text-align:center;padding:8px 4px;font-size:.84rem}.seg .long{display:none}}
+.seg .short{display:none}@media (max-width:600px){.seg .short{display:inline}}
+.seg a[aria-current="page"]{background:var(--navy);color:var(--navy-fg)}
+.fichebox summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;gap:10px;padding:11px 20px;border-top:1px solid var(--line);font-weight:600;font-size:.88rem}
+.fichebox summary::-webkit-details-marker{display:none}
+.fichebox summary::after{content:"▾";color:var(--muted)}
+.fichebox[open] summary::after{content:"▴"}
+.fiche{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));border-top:1px solid var(--line)}
+.fiche>label,.fiche>div{padding:11px 20px;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.fiche input,.fiche select{border:none;border-bottom:1px dashed var(--line);border-radius:0;padding:3px 0;min-height:32px;background:transparent;font-weight:600}
+.fiche input:focus,.fiche select:focus{border-bottom-color:var(--accent);outline:none}
+.fiche .val{font-weight:600;margin-top:3px;color:var(--fg)}
+.strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--line)}
+.tile{border:none;border-right:1px solid var(--line);border-radius:0;padding:13px 18px;background:transparent;text-align:left;display:flex;flex-direction:column;gap:2px}
+.tile:last-child{border-right:none}
+.tile .n{font-family:var(--display);font-size:1.6rem;font-weight:800;line-height:1.1}
+.tile .l{font-size:.76rem;color:var(--muted);font-weight:500}
+.tile[aria-pressed="true"]{background:var(--navy-soft);box-shadow:inset 0 -3px 0 var(--navy)}
+.tile.ok .n{color:var(--ok)} .tile.proche .n{color:var(--info)} .tile.retard .n{color:var(--bad)} .tile.obs .n{color:var(--warn)}
+@media (max-width:600px){.strip{grid-template-columns:repeat(2,minmax(0,1fr))}.tile:nth-child(2){border-right:none}.tile:nth-child(-n+2){border-bottom:1px solid var(--line)}}
+
+/* sommaire lettré */
+.toc{overflow:hidden}
+.toc-cols,.rowhead{display:grid;grid-template-columns:58px minmax(0,1fr) 105px 105px 160px;align-items:center}
+.toc-cols{background:var(--navy);color:var(--navy-fg);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;font-weight:700}
+.toc-cols span{padding:9px 12px}
+.row{border-top:1px solid var(--line)} .row:first-child{border-top:none}
+.rowhead{width:100%;border:none;border-radius:0;background:transparent;padding:0;text-align:left;min-height:58px}
+.rowhead:hover{background:var(--sunk)}
+.rowhead[aria-expanded="true"]{background:var(--navy-soft)}
+.rowhead>span{padding:10px 12px}
+.letter{align-self:stretch;display:flex!important;align-items:center;justify-content:center;font-family:var(--display);font-weight:800;font-size:1.02rem;border-right:1px solid var(--line);background:var(--sunk)}
+.s-retard .letter{box-shadow:inset 4px 0 0 var(--bad)} .s-obs .letter{box-shadow:inset 4px 0 0 var(--warn)} .s-proche .letter{box-shadow:inset 4px 0 0 var(--info)} .s-ok .letter{box-shadow:inset 4px 0 0 var(--ok)}
+.rname{font-weight:600}
+.rdetail{display:block;font-size:.8rem;color:var(--muted)}
+.rmeta{display:none;font-size:.8rem;color:var(--muted);margin-top:3px}
+.clip{font-size:.76rem;color:var(--muted);font-weight:500;margin-left:6px;white-space:nowrap}
+.cell{font-size:.86rem}
+.pill{display:inline-block;font-size:.72rem;font-weight:700;padding:3px 8px;border-radius:4px;white-space:nowrap}
+.p-ok{background:var(--ok-bg);color:var(--ok)} .p-proche{background:var(--info-bg);color:var(--info)} .p-retard{background:var(--bad-bg);color:var(--bad)} .p-obs{background:var(--warn-bg);color:var(--warn)} .p-vide{background:var(--none-bg);color:var(--none)}
+@media (max-width:700px){.toc-cols{display:none}.rowhead{grid-template-columns:50px minmax(0,1fr)}.rowhead .cell{display:none}.rmeta{display:block}}
+.panel{padding:16px 18px 20px 70px;display:flex;flex-direction:column;gap:16px;border-top:1px dashed var(--line)}
+@media (max-width:700px){.panel{padding:14px 14px 18px}}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.obslist,.pjlist{display:flex;flex-direction:column;margin:0;padding:0;list-style:none;gap:6px}
+.ob{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:start;padding:9px 12px;border-radius:6px;background:var(--sunk);border:1px solid var(--line)}
+.ob input{width:20px;height:20px;min-height:0;margin-top:2px}
+.ob.done .t{text-decoration:line-through;color:var(--muted)}
+.pj{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:6px;background:var(--paper)}
+.ftype{display:grid;place-items:center;height:30px;border-radius:4px;border:1.5px solid var(--accent);color:var(--accent);font-family:var(--display);font-weight:800;font-size:.66rem}
+.pj a{font-weight:600;overflow-wrap:anywhere;text-underline-offset:3px}
+.pj .m{display:block;font-size:.78rem;color:var(--muted);overflow-wrap:anywhere}
+.pjgroup{display:flex;align-items:center;gap:10px;padding:8px 2px 2px;font-weight:600;font-size:.88rem}
+.pjgroup .code{font-family:var(--display);font-weight:800;min-width:28px}
+.box{padding:16px 20px;display:flex;flex-direction:column;gap:12px}
+input[type=file]{padding:6px;font-size:.85rem}
+
+/* passages signés */
+.visit{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:6px;background:var(--paper)}
+.visit .m{display:block;font-size:.78rem;color:var(--muted)}
+.sigimg{height:46px;max-width:150px;background:#fff;border:1px solid var(--line);border-radius:4px;padding:2px;object-fit:contain}
+.visitform{border:1.5px solid var(--navy);border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:12px;background:var(--paper)}
+.visitform textarea{min-height:70px;resize:vertical}
+.attest{font-size:.86rem;background:var(--sunk);border-left:3px solid var(--navy);padding:9px 12px}
+.padwrap{position:relative}
+.pad{display:block;width:100%;height:190px;background:#fff;border:1.5px dashed #8A96A8;border-radius:8px;touch-action:none;cursor:crosshair}
+.padhint{position:absolute;left:0;right:0;bottom:12px;text-align:center;font-size:.8rem;color:#8A96A8;pointer-events:none}
+.padline{position:absolute;left:8%;right:8%;bottom:38px;border-bottom:1px solid #C3CAD6;pointer-events:none}
+.chk{flex-direction:row;align-items:flex-start;gap:8px;color:var(--fg);font-size:.88rem}
+.chk input{width:20px;height:20px;min-height:0;flex:0 0 auto;margin-top:1px}
+td .sigimg{height:38px}
+
+/* tableaux */
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:.86rem}
+th,td{padding:9px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+thead th{background:var(--navy);color:var(--navy-fg);font-size:.66rem;text-transform:uppercase;letter-spacing:.1em;font-weight:700}
+tr:last-child td{border-bottom:none}
+td.code{font-family:var(--display);font-weight:800;width:52px;background:var(--sunk)}
+.sign{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;padding:18px 20px}
+.sign .line{border-bottom:1px solid var(--muted);height:60px}
+
+/* sommaire général */
+.sites{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.sitecard{text-decoration:none;color:var(--fg);display:flex;flex-direction:column;gap:12px;border-radius:10px;border:1px solid var(--line);background:var(--paper);overflow:hidden}
+.sitecard:hover{border-color:var(--muted)}
+.sitecard .top{padding:15px 18px 0;border-top:6px solid var(--sc)}
+.sitecard .name{font-family:var(--display);font-weight:800;font-size:1.12rem;display:block;margin-top:2px}
+.sitecard .counts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border-top:1px solid var(--line)}
+.sitecard .counts span{padding:9px 18px;font-size:.78rem;color:var(--muted);border-bottom:1px solid var(--line)}
+.sitecard .counts span:nth-child(odd){border-right:1px solid var(--line)}
+.sitecard .counts b{display:block;font-family:var(--display);font-size:1.25rem;font-weight:800}
+.sitecard .foot{padding:0 18px 13px;font-size:.78rem;color:var(--muted)}
+
+/* accès */
+.person{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 16px;border-top:1px solid var(--line)}
+.person:first-child{border-top:none}
+.checks{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:6px}
+.checks label{flex-direction:row;align-items:center;gap:6px;color:var(--fg);font-size:.88rem}
+.checks input{width:20px;height:20px;min-height:0}
+
+/* connexion */
+.auth{max-width:420px;margin:28px auto;display:flex;flex-direction:column;gap:14px}
+.auth .paper{padding:20px;display:flex;flex-direction:column;gap:14px}
+
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));background:var(--navy);color:var(--navy-fg);padding:10px 16px;border-radius:6px;font-size:.9rem;z-index:20;max-width:calc(100% - 32px)}
+.toast.err{background:var(--bad);color:#fff}
+@media (prefers-reduced-motion:no-preference){.panel{animation:open .18s ease-out}@keyframes open{from{opacity:.4;transform:translateY(-4px)}to{opacity:1;transform:none}}}
+
+/* impression (vue commission) */
+.print-only{display:none}
+@media print{
+  .fichebox summary{display:none!important}
+  :root{--bg:#fff;--paper:#fff;--sunk:#f1f3f6;--fg:#000;--muted:#444;--line:#999;--navy:#1B2F4A;--navy-fg:#fff;color-scheme:light}
+  body{font-size:11.5px;padding:0}
+  .band,.no-print,.toast,.seg,.strip{display:none!important}
+  .print-only{display:block}
+  main{padding-top:0;gap:12px}
+  .paper{border-color:#999}
+  table{min-width:0}
+  thead th{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  td.code{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .cover-top{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  tr{break-inside:avoid}
+  .sectitle{break-after:avoid}
+}
+</style>
+</head>
+<body>
+<header class="band no-print" id="band" hidden><div class="gut"><div class="wrap">
+  <div class="brandrow">
+    <div class="brand"><div class="seal" aria-hidden="true">ERP</div>
+      <div style="min-width:0"><span class="eyebrow">Secteur Est · Vérifications périodiques</span><h1>Registres de sécurité</h1></div></div>
+    <div class="who"><span id="who-name"></span><br><button type="button" id="logout">Se déconnecter</button></div>
+  </div>
+  <nav class="dividers" id="dividers" aria-label="Intercalaires"></nav>
+</div></div></header>
+<div class="gut"><div class="wrap"><main id="main"><div class="loading">Ouverture…</div></main></div></div>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
+<script>
+// =====================================================================
+// Connexion : la même base que Stock Entretien (mêmes comptes)
+// =====================================================================
+window.REG_CONFIG = {
+  supabaseUrl: "https://emjvcirqslewqpyxjqbs.supabase.co",
+  supabaseAnonKey: "sb_publishable_Yy7vh7RkxNZum9gbGuzBGQ_z6wr7ndW",
+  // Adresse de l'application Stock Entretien (création de compte, mot de passe oublié)
+  stockUrl: "../",
+};
+</script>
+<script>
+(() => {
+'use strict';
+const CFG = window.REG_CONFIG;
+const SITE_COLORS = { mandela: 'var(--t1)', aar: 'var(--t2)', canal: 'var(--t3)' };
+const S = { sb: null, me: null, admin: false, mesSites: [], sites: [], rub: [], obs: [], pieces: [], visites: [], visitFor: null, people: {}, urls: {},
+  filter: 'all', open: null, pjFilter: 'all', confirm: null, loadedAt: 0, busy: false };
+const main = document.getElementById('main');
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const today = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+const fr = (s) => { if (!s) return '—'; const [y, m, d] = String(s).slice(0, 10).split('-'); return d + '/' + m + '/' + y; };
+const days = (s) => Math.round((new Date(s + 'T12:00') - new Date(today() + 'T12:00')) / 864e5);
+const plus12 = (s) => { if (!s) return ''; const [y, m, d] = s.split('-').map(Number); const t = new Date(Date.UTC(y + 1, m - 1, d)); return t.toISOString().slice(0, 10); };
+const siteOf = (id) => S.sites.find((s) => s.id === id);
+const rubOf = (site) => S.rub.filter((r) => r.site_id === site);
+const openObs = (rid) => S.obs.filter((o) => o.rubrique_id === rid && !o.levee);
+const piecesOf = (rid) => S.pieces.filter((p) => p.rubrique_id === rid).sort((a, b) => b.ajoute_le.localeCompare(a.ajoute_le));
+const visitesOf = (rid) => S.visites.filter((v) => v.rubrique_id === rid);
+const nameOf = (id) => (id && S.people[id]?.full_name) || '';
+const resLabel = { conforme: 'Conforme', observations: 'Avec observations', '': '—' };
+const avisLabel = (a) => ({ favorable: 'Favorable', defavorable: 'Défavorable' }[a] || '—');
+const TYPES = { 'application/pdf': 'PDF', 'image/jpeg': 'JPG', 'image/png': 'PNG', 'image/webp': 'IMG' };
+const ACCEPT = '.pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp';
+const fmtSize = (b) => (!b ? '' : b >= 1048576 ? (b / 1048576).toFixed(1).replace('.', ',') + ' Mo' : Math.max(1, Math.round(b / 1024)) + ' Ko');
+
+function toast(msg, err) { const t = $('#toast'); t.textContent = msg; t.className = 'toast' + (err ? ' err' : ''); t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => { t.hidden = true; }, err ? 4200 : 2400); }
+function errMsg(e) {
+  const m = (e && (e.message || e.error_description || e.error)) || String(e || '');
+  if (/Invalid login credentials/i.test(m)) return 'Adresse e-mail ou mot de passe incorrect.';
+  if (/row-level security|permission denied/i.test(m)) return 'Vous n\'avez pas l\'autorisation de faire cette modification.';
+  if (/Failed to fetch|NetworkError|Load failed/i.test(m)) return 'Pas de connexion Internet. Réessayez.';
+  if (/exceeded the maximum allowed size|Payload too large/i.test(m)) return 'Fichier trop lourd : 20 Mo maximum.';
+  if (/mime type|invalid_mime/i.test(m)) return 'Format refusé : PDF, JPG, PNG ou WEBP uniquement.';
+  return m || 'Une erreur est survenue.';
+}
+function busy(btn, on) { if (btn) btn.disabled = on; }
+function statut(r) {
+  const n = openObs(r.id).length;
+  if (!r.dernier && !r.prochain) return { k: 'vide', l: 'À renseigner' };
+  if (r.prochain && r.prochain < today()) return { k: 'retard', l: 'En retard' };
+  if (n > 0) return { k: 'obs', l: n + (n > 1 ? ' observations' : ' observation') + ' à lever' };
+  if (r.prochain && days(r.prochain) <= 60) return { k: 'proche', l: 'Échéance dans ' + days(r.prochain) + ' j' };
+  return { k: 'ok', l: 'À jour' };
+}
+function counts(site) {
+  const rs = rubOf(site); const st = rs.map(statut); const c = (k) => st.filter((x) => x.k === k).length;
+  const ids = new Set(rs.map((r) => r.id));
+  return { total: rs.length, ok: c('ok'), proche: c('proche'), retard: c('retard'), obs: S.obs.filter((o) => !o.levee && ids.has(o.rubrique_id)).length };
+}
+
+// ---------------------------------------------------------------------
+// Données
+// ---------------------------------------------------------------------
+async function loadAll() {
+  const sb = S.sb;
+  const [sites, rub, obs, pieces, people, visites] = await Promise.all([
+    sb.from('reg_sites').select('*').order('ordre'),
+    sb.from('reg_rubriques').select('*').order('ordre').order('created_at'),
+    sb.from('reg_observations').select('*').order('cree_le'),
+    sb.from('reg_pieces').select('*'),
+    sb.rpc('reg_personnes'),
+    sb.from('reg_visites').select('*').order('date_visite', { ascending: false }),
+  ]);
+  for (const r of [sites, rub, obs, pieces, people, visites]) if (r.error) throw r.error;
+  S.visites = visites.data;
+  S.sites = sites.data; S.rub = rub.data; S.obs = obs.data; S.pieces = pieces.data;
+  S.people = Object.fromEntries((people.data || []).map((p) => [p.id, p]));
+  S.urls = {};
+  const paths = [...S.pieces.map((p) => p.chemin), ...S.visites.map((v) => v.signature)];
+  if (paths.length) {
+    const { data } = await sb.storage.from('registres').createSignedUrls(paths, 3600);
+    (data || []).forEach((d) => { if (d.signedUrl) S.urls[d.path] = d.signedUrl; });
+  }
+  S.loadedAt = Date.now();
+}
+async function reload() {
+  try { await loadAll(); } catch (e) { toast(errMsg(e), true); }
+  render();
+}
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && S.me && Date.now() - S.loadedAt > 60000 && !editing() && !S.visitFor) reload();
+});
+function editing() { const a = document.activeElement; return a && main.contains(a) && /INPUT|SELECT|TEXTAREA/.test(a.tagName); }
+
+// ---------------------------------------------------------------------
+// Navigation : #/sommaire, #/site/<id>[/pieces|/commission], #/acces
+// ---------------------------------------------------------------------
+function route() {
+  const p = location.hash.replace(/^#\/?/, '').split('/');
+  if (p[0] === 'site' && S.mesSites.includes(p[1])) return { v: 'site', site: p[1], mode: ['pieces', 'commission'].includes(p[2]) ? p[2] : 'registre' };
+  if (p[0] === 'acces' && S.admin) return { v: 'acces' };
+  if (p[0] === 'sommaire' && (S.admin || S.mesSites.length > 1)) return { v: 'sommaire' };
+  return S.admin || S.mesSites.length > 1 ? { v: 'sommaire' } : { v: 'site', site: S.mesSites[0], mode: 'registre' };
+}
+let lastKey = '';
+window.addEventListener('hashchange', () => {
+  const r = route(); const key = r.v + (r.site || '');
+  if (key !== lastKey) { S.filter = 'all'; S.open = null; S.pjFilter = 'all'; S.visitFor = null; window.scrollTo(0, 0); }
+  S.confirm = null; render();
+});
+
+function renderTabs(r) {
+  const tabs = [];
+  if (S.admin || S.mesSites.length > 1) tabs.push({ href: '#/sommaire', n: 'Sommaire', s: S.admin ? 'Supervision' : 'Mes sites', cur: r.v === 'sommaire' });
+  S.sites.forEach((x) => { const c = counts(x.id); tabs.push({ href: '#/site/' + x.id, n: x.court, s: c.ok + ' / ' + c.total + ' à jour', cur: r.site === x.id, color: SITE_COLORS[x.id] }); });
+  if (S.admin) tabs.push({ href: '#/acces', n: 'Accès', s: 'Qui peut entrer', cur: r.v === 'acces' });
+  $('#dividers').innerHTML = tabs.map((t) => `<a href="${t.href}" ${t.cur ? 'aria-current="page"' : ''}>${t.color ? `<span class="dot" style="background:${t.color}"></span>` : ''}<span class="tn">${esc(t.n)}</span><span class="ts num">${esc(t.s)}</span></a>`).join('');
+}
+
+function render() {
+  if (!S.me) return;
+  const r = route(); lastKey = r.v + (r.site || '');
+  renderTabs(r);
+  if (r.v === 'sommaire') return renderSommaire();
+  if (r.v === 'acces') return renderAcces();
+  return renderSite(r.site, r.mode);
+}
+
+// ---------------------------------------------------------------------
+// Sommaire (supervision)
+// ---------------------------------------------------------------------
+function renderSommaire() {
+  const ids = new Set(S.rub.map((r) => r.id));
+  const allObs = S.obs.filter((o) => !o.levee && ids.has(o.rubrique_id)).length;
+  const rows = S.rub.filter((r) => r.prochain).sort((a, b) => a.prochain.localeCompare(b.prochain)).slice(0, 12);
+  main.innerHTML = `
+    <div class="sectitle"><h2>${S.admin ? 'Tableau de supervision' : 'Mes registres'}</h2><span class="small muted num">au ${fr(today())}</span></div>
+    <div class="sites">${S.sites.map((x) => { const c = counts(x.id); return `<a class="sitecard" style="--sc:${SITE_COLORS[x.id]}" href="#/site/${x.id}">
+      <span class="top"><span class="eyebrow">${esc([x.type_erp ? 'ERP type ' + x.type_erp : '', x.categorie].filter(Boolean).join(' · ') || 'Fiche à compléter')}</span><span class="name">${esc(x.nom)}</span></span>
+      <span class="counts num"><span><b style="color:var(--ok)">${c.ok} / ${c.total}</b>rubriques à jour</span><span><b style="color:var(--bad)">${c.retard}</b>en retard</span><span><b style="color:var(--info)">${c.proche}</b>échéances ≤ 60 j</span><span><b style="color:var(--warn)">${c.obs}</b>observations à lever</span></span>
+      <span class="foot">Dernière commission : ${fr(x.derniere_commission)} · avis ${avisLabel(x.avis)}</span></a>`; }).join('')}</div>
+    <section style="display:flex;flex-direction:column;gap:10px"><div class="sectitle"><h3>Prochaines échéances</h3></div>
+    ${rows.length ? `<div class="paper tablewrap"><table><thead><tr><th>Échéance</th><th>Site</th><th>Réf.</th><th>Rubrique</th><th>État</th></tr></thead><tbody>${rows.map((r) => { const st = statut(r); return `<tr><td class="num">${fr(r.prochain)}</td><td>${esc(siteOf(r.site_id)?.court)}</td><td class="code">${esc(r.lettre)}</td><td>${esc(r.nom)}</td><td><span class="pill p-${st.k}">${st.l}</span></td></tr>`; }).join('')}</tbody></table></div>`
+      : '<div class="paper empty small">Aucune échéance pour l\'instant. Elles apparaîtront ici dès que des dates de contrôle seront saisies.</div>'}</section>
+    <p class="small muted" style="margin:0">${allObs} observation${allObs > 1 ? 's' : ''} à lever sur l'ensemble des sites.</p>`;
+}
+
+// ---------------------------------------------------------------------
+// Page d'un site
+// ---------------------------------------------------------------------
+function renderSite(id, mode) {
+  const x = siteOf(id);
+  if (!x) { main.innerHTML = '<div class="empty">Site introuvable.</div>'; return; }
+  main.innerHTML = `
+    <div class="print-only"><span class="eyebrow">Registre de sécurité · Vérifications périodiques · Secteur Est</span></div>
+    <section class="paper cover" style="--sc:${SITE_COLORS[id]}">
+      <div class="cover-top"><div><span class="eyebrow">Registre de sécurité</span><h2>${esc(x.nom)}</h2></div>
+        <nav class="seg no-print" aria-label="Affichage">
+          <a href="#/site/${id}" ${mode === 'registre' ? 'aria-current="page"' : ''}>Registre</a>
+          <a href="#/site/${id}/pieces" ${mode === 'pieces' ? 'aria-current="page"' : ''}><span class="long">Pièces jointes</span><span class="short">Pièces</span></a>
+          <a href="#/site/${id}/commission" ${mode === 'commission' ? 'aria-current="page"' : ''}><span class="long">Vue commission</span><span class="short">Commission</span></a></nav></div>
+      <details class="fichebox" id="fichebox"><summary class="no-print"><span>Fiche de l'établissement</span><span class="small muted" id="fiche-sum"></span></summary><div class="fiche" id="fiche"></div></details>
+      ${mode === 'registre' ? '<div class="strip" id="strip"></div>' : ''}
+    </section>
+    <div id="body" style="display:flex;flex-direction:column;gap:20px"></div>`;
+  const fb = $('#fichebox'); fb.open = mode === 'commission' || window.matchMedia('(min-width: 701px)').matches;
+  $('#fiche-sum').textContent = [x.type_erp ? 'Type ' + x.type_erp : '', x.categorie, x.effectif ? x.effectif + ' pers.' : ''].filter(Boolean).join(' · ');
+  renderFiche(x, mode);
+  if (mode === 'pieces') return renderPieces(x);
+  if (mode === 'commission') return renderCommission(x);
+  renderStrip(id);
+  $('#body').innerHTML = `
+    <section style="display:flex;flex-direction:column;gap:10px">
+      <div class="actions"><div class="sectitle"><h2 style="letter-spacing:.06em;text-transform:uppercase">Sommaire</h2></div><button type="button" class="link" id="showall" ${S.filter === 'all' ? 'hidden' : ''}>Afficher toutes les rubriques</button></div>
+      <div class="paper toc"><div class="toc-cols" aria-hidden="true"><span>Réf.</span><span>Rubrique</span><span>Dernier</span><span>Prochain</span><span>État</span></div><div id="list"></div></div>
+      <div class="addrow no-print"><input id="new-rub" placeholder="Ajouter une rubrique à ce registre" aria-label="Nom de la nouvelle rubrique"><button type="button" id="add-rub">Ajouter</button></div>
+    </section>`;
+  $('#showall').onclick = () => { S.filter = 'all'; render(); };
+  $('#add-rub').onclick = (e) => addRubrique(id, e.target);
+  renderList(id);
+}
+function renderFiche(x, mode) {
+  const F = $('#fiche');
+  if (mode !== 'registre') {
+    F.innerHTML = [['Type d\'ERP', x.type_erp], ['Catégorie', x.categorie], ['Effectif maximal', x.effectif ? x.effectif + ' pers.' : ''],
+      ['Dernière commission', x.derniere_commission ? fr(x.derniere_commission) + ' · ' + avisLabel(x.avis) : ''], ['Prochaine commission', x.prochaine_commission ? fr(x.prochaine_commission) : ''], ['Édité le', fr(today())]]
+      .map(([l, v]) => `<div><div class="eyebrow">${l}</div><div class="val num">${esc(v || '—')}</div></div>`).join('');
+    return;
+  }
+  F.innerHTML = `
+    <label for="i-type">Type d'ERP<input id="i-type" data-i="type_erp" value="${esc(x.type_erp)}" placeholder="X, PA…"></label>
+    <label for="i-cat">Catégorie<input id="i-cat" data-i="categorie" value="${esc(x.categorie)}" placeholder="1re catégorie"></label>
+    <label for="i-eff">Effectif maximal<input id="i-eff" data-i="effectif" value="${esc(x.effectif)}" inputmode="numeric" placeholder="Nombre de personnes"></label>
+    <label for="i-der">Dernière commission<input type="date" id="i-der" data-i="derniere_commission" value="${esc(x.derniere_commission || '')}"></label>
+    <label for="i-avis">Avis rendu<select id="i-avis" data-i="avis"><option value="">Non renseigné</option><option value="favorable" ${x.avis === 'favorable' ? 'selected' : ''}>Favorable</option><option value="defavorable" ${x.avis === 'defavorable' ? 'selected' : ''}>Défavorable</option></select></label>
+    <label for="i-pro">Prochaine commission<input type="date" id="i-pro" data-i="prochaine_commission" value="${esc(x.prochaine_commission || '')}"></label>`;
+  $$('[data-i]', F).forEach((el) => el.addEventListener('change', async () => {
+    const v = el.value.trim(); const k = el.dataset.i;
+    const patch = { [k]: /commission$/.test(k) ? (v || null) : v };
+    const { error } = await S.sb.from('reg_sites').update(patch).eq('id', x.id);
+    if (error) return toast(errMsg(error), true);
+    Object.assign(x, patch); toast('Fiche enregistrée'); renderTabs(route());
+  }));
+}
+function renderStrip(id) {
+  const c = counts(id);
+  const tiles = [['ok', 'Rubriques à jour', c.ok + ' / ' + c.total], ['proche', 'Échéances ≤ 60 jours', c.proche], ['retard', 'Contrôles en retard', c.retard], ['obs', 'Observations à lever', c.obs]];
+  $('#strip').innerHTML = tiles.map(([k, l, n]) => `<button type="button" class="tile ${k}" data-f="${k}" aria-pressed="${S.filter === k}"><span class="n num">${n}</span><span class="l">${l}</span></button>`).join('');
+  $$('[data-f]', $('#strip')).forEach((b) => { b.onclick = () => { S.filter = S.filter === b.dataset.f ? 'all' : b.dataset.f; render(); }; });
+}
+function pieceHTML(p) {
+  const canDel = S.admin || p.ajoute_par === S.me.id;
+  const url = S.urls[p.chemin];
+  return `<li class="pj"><span class="ftype">${TYPES[p.type] || 'FICHIER'}</span>
+    <span style="min-width:0">${url ? `<a href="${esc(url)}" target="_blank" rel="noopener">${esc(p.titre || p.nom_fichier)}</a>` : `<b>${esc(p.titre || p.nom_fichier)}</b>`}
+    <span class="m num">${p.titre ? esc(p.nom_fichier) + ' · ' : ''}${fmtSize(p.taille)} · ajouté le ${fr(p.ajoute_le)}${nameOf(p.ajoute_par) ? ' par ' + esc(nameOf(p.ajoute_par)) : ''}</span></span>
+    ${canDel ? `<button type="button" class="link danger" data-delpj="${p.id}">${S.confirm === 'pj' + p.id ? 'Confirmer' : 'Retirer'}</button>` : '<span></span>'}</li>`;
+}
+function visitHTML(v) {
+  const url = S.urls[v.signature];
+  return `<li class="visit"><span style="min-width:0"><b>${esc(v.entreprise)}</b> · ${esc(v.intervenant)}
+    <span class="m num">Passage du ${fr(v.date_visite)}${v.resultat ? ' · ' + resLabel[v.resultat] : ''}${nameOf(v.vise_par) ? ' · visé par ' + esc(nameOf(v.vise_par)) : ''}</span>
+    ${v.objet ? `<span class="m">${esc(v.objet)}</span>` : ''}${v.remarques ? `<span class="m">Remarques : ${esc(v.remarques)}</span>` : ''}
+    ${S.admin ? `<button type="button" class="link danger small" data-delvis="${v.id}">${S.confirm === 'vis' + v.id ? 'Confirmer la suppression' : 'Supprimer'}</button>` : ''}</span>
+    ${url ? `<img class="sigimg" src="${esc(url)}" alt="Signature de ${esc(v.intervenant)}">` : '<span class="small muted">Signature</span>'}</li>`;
+}
+function visitFormHTML(r) {
+  return `<div class="visitform" id="vf">
+    <div class="sectitle"><h3>Passage d'une entreprise extérieure</h3></div>
+    <div class="grid2">
+      <label for="v-date">Date du passage<input type="date" id="v-date" value="${today()}"></label>
+      <label for="v-ent">Entreprise<input id="v-ent" value="${esc(r.intervenant)}" placeholder="Socotec, Apave, Sicli…" autocomplete="organization"></label>
+      <label for="v-int">Nom et prénom de l'intervenant<input id="v-int" placeholder="Jean Martin" autocomplete="off"></label>
+      <label for="v-res">Résultat<select id="v-res"><option value="">Non renseigné</option><option value="conforme">Conforme</option><option value="observations">Avec observations</option></select></label>
+      <label for="v-obj" style="grid-column:1/-1">Objet de l'intervention<input id="v-obj" value="${esc(r.nom)}"></label>
+      <label for="v-rem" style="grid-column:1/-1">Remarques de l'intervenant (une par ligne)<textarea id="v-rem" placeholder="Bloc autonome hors service, couloir vestiaires 3"></textarea></label>
+    </div>
+    <p class="attest" id="v-att" style="margin:0"></p>
+    <div class="padwrap"><canvas class="pad" id="v-pad" aria-label="Zone de signature de l'intervenant"></canvas><span class="padline"></span><span class="padhint" id="v-hint">Signature de l'intervenant, au doigt ou à la souris</span></div>
+    <div class="actions"><button type="button" class="link" id="v-clear">Effacer la signature</button></div>
+    <label class="chk"><input type="checkbox" id="v-upd" checked>Mettre à jour la rubrique : dernier contrôle à cette date, prochain dans 12 mois</label>
+    <label class="chk"><input type="checkbox" id="v-obs" checked>Ajouter les remarques aux observations à lever</label>
+    <div class="actions"><button type="button" id="v-cancel">Annuler</button><button type="button" class="primary" id="v-save">Valider le passage signé</button></div>
+  </div>`;
+}
+function initPad(cv, onInk) {
+  const ratio = window.devicePixelRatio || 1;
+  const rect = cv.getBoundingClientRect();
+  cv.width = Math.round(rect.width * ratio); cv.height = Math.round(rect.height * ratio);
+  const ctx = cv.getContext('2d');
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#0E1B33'; ctx.lineWidth = 2.4 * ratio;
+  let drawing = false, last = null, ink = 0;
+  const pt = (e) => { const b = cv.getBoundingClientRect(); return [(e.clientX - b.left) * ratio, (e.clientY - b.top) * ratio]; };
+  cv.addEventListener('pointerdown', (e) => { e.preventDefault(); drawing = true; last = pt(e); cv.setPointerCapture(e.pointerId);
+    ctx.beginPath(); ctx.arc(last[0], last[1], ctx.lineWidth / 2, 0, Math.PI * 2); ctx.fillStyle = ctx.strokeStyle; ctx.fill(); });
+  cv.addEventListener('pointermove', (e) => { if (!drawing) return; e.preventDefault(); const p = pt(e);
+    ctx.beginPath(); ctx.moveTo(last[0], last[1]); ctx.lineTo(p[0], p[1]); ctx.stroke();
+    ink += Math.hypot(p[0] - last[0], p[1] - last[1]) / ratio; last = p; onInk(ink); });
+  const end = () => { drawing = false; };
+  cv.addEventListener('pointerup', end); cv.addEventListener('pointercancel', end);
+  return { clear() { ctx.clearRect(0, 0, cv.width, cv.height); ink = 0; onInk(0); }, ink: () => ink,
+    blob() { // signature sur fond blanc, recadrée
+      const out = document.createElement('canvas'); out.width = cv.width; out.height = cv.height;
+      const o = out.getContext('2d'); o.fillStyle = '#fff'; o.fillRect(0, 0, out.width, out.height); o.drawImage(cv, 0, 0);
+      return new Promise((res) => out.toBlob(res, 'image/png')); } };
+}
+function panelHTML(r) {
+  const obs = S.obs.filter((o) => o.rubrique_id === r.id).sort((a, b) => (a.levee - b.levee) || a.cree_le.localeCompare(b.cree_le));
+  const pcs = piecesOf(r.id);
+  return `<div class="panel">
+    <form class="grid2" id="rf" novalidate>
+      <label for="f-dernier">Dernier contrôle ou mise à jour<input type="date" id="f-dernier" name="dernier" value="${esc(r.dernier || '')}"></label>
+      <label for="f-int">Organisme, technicien ou service<input id="f-int" name="intervenant" value="${esc(r.intervenant)}" placeholder="Nom de l'intervenant"></label>
+      <label for="f-res">Résultat<select id="f-res" name="resultat"><option value="">Non renseigné</option><option value="conforme" ${r.resultat === 'conforme' ? 'selected' : ''}>Conforme</option><option value="observations" ${r.resultat === 'observations' ? 'selected' : ''}>Avec observations</option></select></label>
+      <label for="f-pro">Prochain contrôle<input type="date" id="f-pro" name="prochain" value="${esc(r.prochain || '')}"></label>
+      <label for="f-ref" style="grid-column:1/-1">Référence du rapport ou du document<input id="f-ref" name="reference" value="${esc(r.reference)}" placeholder="N° de rapport, ou emplacement dans le classeur papier"></label>
+    </form>
+    <div class="actions"><span class="small muted">${r.maj_le ? 'Dernière saisie le ' + fr(r.maj_le) + (nameOf(r.maj_par) ? ' par ' + esc(nameOf(r.maj_par)) : '') : 'Aucune saisie pour l\'instant'}</span><button type="button" class="primary" id="r-save">Enregistrer</button></div>
+    <div style="display:flex;flex-direction:column;gap:8px"><h4>Observations à lever</h4>
+      ${obs.length ? `<ul class="obslist">${obs.map((o) => `<li class="ob ${o.levee ? 'done' : ''}">
+        <input type="checkbox" id="o-${o.id}" data-obs="${o.id}" ${o.levee ? 'checked' : ''} aria-label="Marquer comme levée">
+        <label for="o-${o.id}" style="color:var(--fg);font-size:.92rem;font-weight:400"><span class="t">${esc(o.texte)}</span>
+        <span class="small muted">${o.levee ? 'Levée le ' + fr(o.levee_le) + (nameOf(o.levee_par) ? ' par ' + esc(nameOf(o.levee_par)) : '') : 'Relevée le ' + fr(o.cree_le)}</span></label>
+        <button type="button" class="link danger small" data-delobs="${o.id}">${S.confirm === 'obs' + o.id ? 'Confirmer' : 'Supprimer'}</button></li>`).join('')}</ul>`
+      : '<p class="small muted" style="margin:0">Aucune observation pour cette rubrique.</p>'}
+      <div class="addrow"><input id="new-obs" placeholder="Saisir une observation du rapport" aria-label="Nouvelle observation"><button type="button" id="add-obs">Ajouter</button></div></div>
+    <div style="display:flex;flex-direction:column;gap:8px"><h4>Pièces jointes</h4>
+      ${pcs.length ? `<ul class="pjlist">${pcs.map(pieceHTML).join('')}</ul>` : '<p class="small muted" style="margin:0">Aucun document joint à cette rubrique.</p>'}
+      <div class="addrow"><input type="file" id="pjf" accept="${ACCEPT}" aria-label="Fichier à joindre"><button type="button" id="pj-up">Joindre</button></div></div>
+    <div style="display:flex;flex-direction:column;gap:8px"><h4>Passages d'entreprises extérieures</h4>
+      ${visitesOf(r.id).length ? `<ul class="pjlist">${visitesOf(r.id).map(visitHTML).join('')}</ul>` : '<p class="small muted" style="margin:0">Aucun passage signé pour cette rubrique.</p>'}
+      ${S.visitFor === r.id ? visitFormHTML(r) : '<div><button type="button" id="v-open">✍ Faire signer un passage</button></div>'}</div>
+    <div><button type="button" class="link danger" id="r-del">${S.confirm === 'rub' + r.id ? 'Confirmer : retirer la rubrique et ses observations (les pièces jointes restent dans les documents généraux)' : 'Retirer cette rubrique'}</button></div>
+  </div>`;
+}
+function renderList(site) {
+  const L = $('#list');
+  const rs = rubOf(site);
+  if (!rs.length) { L.innerHTML = '<div class="empty">Ce registre ne contient aucune rubrique. Ajoutez la première avec le champ ci-dessous.</div>'; return; }
+  const rows = rs.filter((r) => S.filter === 'all' || statut(r).k === S.filter);
+  if (!rows.length) { L.innerHTML = '<div class="empty">Aucune rubrique dans cette catégorie.</div>'; return; }
+  L.innerHTML = rows.map((r) => { const st = statut(r); const n = piecesOf(r.id).length; const open = S.open === r.id;
+    return `<div class="row s-${st.k}" id="row-${r.id}"><button type="button" class="rowhead" data-open="${r.id}" aria-expanded="${open}">
+      <span class="letter">${esc(r.lettre || '·')}</span>
+      <span style="min-width:0"><span class="rname">${esc(r.nom)}</span>${n ? `<span class="clip num">· ${n} PJ</span>` : ''}${r.detail ? `<span class="rdetail">${esc(r.detail)}</span>` : ''}
+        <span class="rmeta num">${r.dernier ? 'Le ' + fr(r.dernier) + (r.prochain ? ' · prochain ' + fr(r.prochain) + ' ' : ' ') : ''}<span class="pill p-${st.k}">${st.l}</span></span></span>
+      <span class="cell num">${fr(r.dernier)}</span><span class="cell num">${fr(r.prochain)}</span><span class="cell"><span class="pill p-${st.k}">${st.l}</span></span>
+    </button>${open ? panelHTML(r) : ''}</div>`; }).join('');
+  $$('[data-open]', L).forEach((b) => { b.onclick = () => { S.open = S.open === b.dataset.open ? null : b.dataset.open; S.confirm = null; S.visitFor = null; renderList(site); if (S.open) $('#row-' + S.open)?.scrollIntoView({ block: 'nearest' }); }; });
+  if (!S.open) return;
+  const r = S.rub.find((x) => x.id === S.open); if (!r) return;
+  const P = $('#row-' + r.id);
+  const fD = $('#f-dernier', P), fP = $('#f-pro', P);
+  fD.addEventListener('change', () => { if (fD.value) fP.value = plus12(fD.value); });
+  $('#r-save', P).onclick = async (e) => {
+    const f = $('#rf', P); const v = (n) => f.elements[n].value.trim();
+    const patch = { dernier: v('dernier') || null, intervenant: v('intervenant'), resultat: v('resultat'), prochain: v('prochain') || null, reference: v('reference') };
+    busy(e.target, true);
+    const { data, error } = await S.sb.from('reg_rubriques').update(patch).eq('id', r.id).select().single();
+    busy(e.target, false);
+    if (error) return toast(errMsg(error), true);
+    Object.assign(r, data); toast('Rubrique enregistrée'); renderStrip(site); renderList(site); renderTabs(route());
+  };
+  $('#add-obs', P).onclick = async (e) => {
+    const inp = $('#new-obs', P); const t = inp.value.trim();
+    if (!t) { inp.focus(); return toast('Saisissez le texte de l\'observation.', true); }
+    busy(e.target, true);
+    const { data, error } = await S.sb.from('reg_observations').insert({ rubrique_id: r.id, texte: t }).select().single();
+    busy(e.target, false);
+    if (error) return toast(errMsg(error), true);
+    S.obs.push(data); toast('Observation ajoutée'); renderStrip(site); renderList(site);
+  };
+  $$('[data-obs]', P).forEach((c) => { c.onchange = async () => {
+    const { data, error } = await S.sb.from('reg_observations').update({ levee: c.checked }).eq('id', c.dataset.obs).select().single();
+    if (error) { c.checked = !c.checked; return toast(errMsg(error), true); }
+    Object.assign(S.obs.find((o) => o.id === data.id), data); toast(data.levee ? 'Observation levée' : 'Observation rouverte'); renderStrip(site); renderList(site);
+  }; });
+  $$('[data-delobs]', P).forEach((b) => { b.onclick = async () => {
+    const id = b.dataset.delobs;
+    if (S.confirm !== 'obs' + id) { S.confirm = 'obs' + id; return renderList(site); }
+    S.confirm = null;
+    const { error } = await S.sb.from('reg_observations').delete().eq('id', id);
+    if (error) return toast(errMsg(error), true);
+    S.obs = S.obs.filter((o) => o.id !== id); toast('Observation supprimée'); renderStrip(site); renderList(site);
+  }; });
+  $('#pj-up', P).onclick = async (e) => { const inp = $('#pjf', P); if (await uploadPiece(inp.files[0], site, r.id, '', e.target)) renderList(site); };
+  $$('[data-delpj]', P).forEach((b) => { b.onclick = () => removePiece(b.dataset.delpj, () => renderList(site)); });
+  $('#r-del', P).onclick = async () => {
+    if (S.confirm !== 'rub' + r.id) { S.confirm = 'rub' + r.id; return renderList(site); }
+    S.confirm = null;
+    const { error } = await S.sb.from('reg_rubriques').delete().eq('id', r.id);
+    if (error) return toast(errMsg(error), true);
+    S.open = null; toast('Rubrique retirée'); reload();
+  };
+  $$('[data-delvis]', P).forEach((b) => { b.onclick = async () => {
+    const id = b.dataset.delvis; const v = S.visites.find((x) => x.id === id);
+    if (S.confirm !== 'vis' + id) { S.confirm = 'vis' + id; return renderList(site); }
+    S.confirm = null;
+    const { error } = await S.sb.from('reg_visites').delete().eq('id', id);
+    if (error) return toast(errMsg(error), true);
+    await S.sb.storage.from('registres').remove([v.signature]);
+    S.visites = S.visites.filter((x) => x.id !== id); toast('Passage supprimé'); renderList(site);
+  }; });
+  const vo = $('#v-open', P);
+  if (vo) vo.onclick = () => { S.visitFor = r.id; S.confirm = null; renderList(site); $('#vf')?.scrollIntoView({ block: 'start', behavior: 'smooth' }); };
+  if (S.visitFor === r.id && $('#vf', P)) wireVisit(r, site, P);
+}
+function wireVisit(r, site, P) {
+  const hint = $('#v-hint', P);
+  const pad = initPad($('#v-pad', P), (ink) => { hint.hidden = ink > 0; });
+  const att = () => { const n = $('#v-int', P).value.trim() || '…', e = $('#v-ent', P).value.trim() || '…', d = $('#v-date', P).value;
+    $('#v-att', P).textContent = `Je soussigné(e) ${n}, intervenant(e) pour l'entreprise ${e}, atteste avoir réalisé l'intervention décrite ci-dessus au ${siteOf(site).nom} le ${fr(d)}.`; };
+  ['#v-int', '#v-ent', '#v-date'].forEach((k) => $(k, P).addEventListener('input', att)); att();
+  const syncObs = () => { $('#v-obs', P).closest('label').hidden = !$('#v-rem', P).value.trim(); };
+  $('#v-rem', P).addEventListener('input', syncObs); syncObs();
+  $('#v-clear', P).onclick = () => pad.clear();
+  $('#v-cancel', P).onclick = () => { S.visitFor = null; renderList(site); };
+  $('#v-save', P).onclick = async (e) => {
+    const date = $('#v-date', P).value, ent = $('#v-ent', P).value.trim(), int = $('#v-int', P).value.trim();
+    const res = $('#v-res', P).value, obj = $('#v-obj', P).value.trim(), rem = $('#v-rem', P).value.trim();
+    if (!date) return toast('Indiquez la date du passage.', true);
+    if (!ent) { $('#v-ent', P).focus(); return toast('Indiquez le nom de l\'entreprise.', true); }
+    if (!int) { $('#v-int', P).focus(); return toast('Indiquez le nom de l\'intervenant.', true); }
+    if (pad.ink() < 25) return toast('La signature de l\'intervenant est manquante.', true);
+    busy(e.target, true);
+    const chemin = site + '/signatures/' + (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2)) + '.png';
+    try {
+      const blob = await pad.blob();
+      const up = await S.sb.storage.from('registres').upload(chemin, blob, { contentType: 'image/png', upsert: false });
+      if (up.error) throw up.error;
+      const ins = await S.sb.from('reg_visites').insert({ site_id: site, rubrique_id: r.id, date_visite: date, entreprise: ent, intervenant: int, objet: obj, resultat: res, remarques: rem, signature: chemin, vise_par: S.me.id }).select().single();
+      if (ins.error) { await S.sb.storage.from('registres').remove([chemin]); throw ins.error; }
+      if ($('#v-upd', P).checked) {
+        const u = await S.sb.from('reg_rubriques').update({ dernier: date, intervenant: ent, resultat: res || r.resultat, prochain: plus12(date) }).eq('id', r.id);
+        if (u.error) toast(errMsg(u.error), true);
+      }
+      const lines = rem.split('\n').map((l) => l.trim()).filter(Boolean);
+      if (lines.length && $('#v-obs', P).checked) {
+        const o = await S.sb.from('reg_observations').insert(lines.map((t) => ({ rubrique_id: r.id, texte: t })));
+        if (o.error) toast(errMsg(o.error), true);
+      }
+      S.visitFor = null; toast('Passage signé enregistré');
+      await reload();
+    } catch (err) { toast(errMsg(err), true); } finally { busy(e.target, false); }
+  };
+}
+async function addRubrique(site, btn) {
+  const inp = $('#new-rub'); const nom = inp.value.trim();
+  if (!nom) { inp.focus(); return toast('Saisissez le nom de la rubrique.', true); }
+  const ordre = Math.max(0, ...rubOf(site).map((r) => r.ordre)) + 1;
+  busy(btn, true);
+  const { data, error } = await S.sb.from('reg_rubriques').insert({ site_id: site, nom, ordre }).select().single();
+  busy(btn, false);
+  if (error) return toast(errMsg(error), true);
+  S.rub.push(data); S.open = data.id; S.filter = 'all'; toast('Rubrique ajoutée'); render();
+}
+
+// ---------------------------------------------------------------------
+// Pièces jointes
+// ---------------------------------------------------------------------
+function fileType(f) { const e = (f.name.split('.').pop() || '').toLowerCase(); return { pdf: 'application/pdf', jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp' }[e] || f.type; }
+async function shrinkPhoto(file, type) {
+  // Photos de plus de 1,5 Mo : réduites à 2000 px pour économiser l'espace
+  if (!/^image\/(jpeg|png|webp)$/.test(type) || file.size < 1.5 * 1048576 || !window.createImageBitmap) return { blob: file, type };
+  try {
+    const bmp = await createImageBitmap(file);
+    const k = Math.min(1, 2000 / Math.max(bmp.width, bmp.height));
+    const c = document.createElement('canvas'); c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k);
+    c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+    const blob = await new Promise((res) => c.toBlob(res, 'image/jpeg', 0.82));
+    return blob && blob.size < file.size ? { blob, type: 'image/jpeg' } : { blob: file, type };
+  } catch (e) { return { blob: file, type }; }
+}
+async function uploadPiece(file, site, rubriqueId, titre, btn) {
+  if (!file) { toast('Choisissez d\'abord un fichier.', true); return false; }
+  let type = fileType(file);
+  if (!TYPES[type]) { toast('Formats acceptés : PDF, JPG, PNG ou WEBP.', true); return false; }
+  if (S.busy) return false;
+  S.busy = true; busy(btn, true); toast('Envoi en cours…');
+  try {
+    const sh = await shrinkPhoto(file, type); type = sh.type;
+    if (sh.blob.size > 20 * 1048576) { toast('Fichier trop lourd : 20 Mo maximum.', true); return false; }
+    let nom = file.name; if (type === 'image/jpeg' && !/\.jpe?g$/i.test(nom)) nom = nom.replace(/\.[^.]+$/, '') + '.jpg';
+    const safe = nom.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^A-Za-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '').slice(-80) || 'document';
+    const chemin = site + '/' + (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2)) + '-' + safe;
+    const up = await S.sb.storage.from('registres').upload(chemin, sh.blob, { contentType: type, upsert: false });
+    if (up.error) throw up.error;
+    const { data, error } = await S.sb.from('reg_pieces').insert({ site_id: site, rubrique_id: rubriqueId === 'general' ? null : rubriqueId, titre: (titre || '').trim(), nom_fichier: nom, chemin, type, taille: sh.blob.size, ajoute_par: S.me.id }).select().single();
+    if (error) { await S.sb.storage.from('registres').remove([chemin]); throw error; }
+    const s = await S.sb.storage.from('registres').createSignedUrl(chemin, 3600);
+    if (s.data) S.urls[chemin] = s.data.signedUrl;
+    S.pieces.push(data); toast('Pièce jointe ajoutée'); return true;
+  } catch (e) { toast(errMsg(e), true); return false; } finally { S.busy = false; busy(btn, false); }
+}
+async function removePiece(id, rerender) {
+  const p = S.pieces.find((x) => x.id === id); if (!p) return;
+  if (S.confirm !== 'pj' + id) { S.confirm = 'pj' + id; return rerender(); }
+  S.confirm = null;
+  const rm = await S.sb.storage.from('registres').remove([p.chemin]);
+  if (rm.error) { toast(errMsg(rm.error), true); return rerender(); }
+  const { error } = await S.sb.from('reg_pieces').delete().eq('id', id);
+  if (error) { toast(errMsg(error), true); return rerender(); }
+  S.pieces = S.pieces.filter((x) => x.id !== id); toast('Pièce jointe retirée'); rerender();
+}
+function renderPieces(x) {
+  const rs = rubOf(x.id);
+  const opts = rs.map((r) => `<option value="${r.id}">${esc((r.lettre ? r.lettre + ' · ' : '') + r.nom)}</option>`).join('') + '<option value="general">Documents généraux du site</option>';
+  const all = S.pieces.filter((p) => p.site_id === x.id);
+  const groups = [...rs.map((r) => ({ id: r.id, code: r.lettre || '·', nom: r.nom })), { id: 'general', code: '—', nom: 'Documents généraux du site' }]
+    .filter((g) => S.pjFilter === 'all' || S.pjFilter === g.id)
+    .map((g) => ({ ...g, items: g.id === 'general' ? all.filter((p) => !p.rubrique_id) : piecesOf(g.id) })).filter((g) => g.items.length);
+  $('#body').innerHTML = `
+    <section class="paper box"><div class="sectitle"><h3>Joindre un document</h3><span class="small muted">PDF, JPG, PNG ou WEBP · 20 Mo maximum · les photos lourdes sont allégées</span></div>
+      <div class="grid2">
+        <label for="pj-sect">Rubrique<select id="pj-sect">${opts}</select></label>
+        <label for="pj-titre">Intitulé (facultatif)<input id="pj-titre" placeholder="Rapport de vérification 2026"></label>
+        <label for="pj-file">Fichier<input type="file" id="pj-file" accept="${ACCEPT}"></label></div>
+      <div class="actions"><span class="small muted">Visible par toutes les personnes autorisées sur ce registre.</span><button type="button" class="primary" id="pj-send">Joindre le fichier</button></div></section>
+    <section style="display:flex;flex-direction:column;gap:10px">
+      <div class="actions"><div class="sectitle"><h3>Pièces jointes</h3><span class="small muted num">${all.length}</span></div>
+        <label for="pj-filter" style="flex-direction:row;align-items:center;gap:8px">Afficher<select id="pj-filter" style="width:auto;max-width:260px"><option value="all">Toutes les rubriques</option>${opts}</select></label></div>
+      ${groups.length ? groups.map((g) => `<div class="pjgroup"><span class="code">${esc(g.code)}</span><span>${esc(g.nom)}</span></div><ul class="pjlist">${g.items.map(pieceHTML).join('')}</ul>`).join('')
+        : `<div class="paper empty">${all.length ? 'Aucune pièce jointe pour cette rubrique.' : 'Aucune pièce jointe pour l\'instant. Rapports de vérification, PV de commission, plans ou attestations : joignez-les ici, rubrique par rubrique.'}</div>`}
+    </section>`;
+  $('#pj-filter').value = S.pjFilter;
+  if (S.pjFilter !== 'all') $('#pj-sect').value = S.pjFilter;
+  $('#pj-filter').onchange = (e) => { S.pjFilter = e.target.value; renderPieces(x); };
+  $('#pj-send').onclick = async (e) => { if (await uploadPiece($('#pj-file').files[0], x.id, $('#pj-sect').value, $('#pj-titre').value, e.target)) renderPieces(x); };
+  $$('[data-delpj]', $('#body')).forEach((b) => { b.onclick = () => removePiece(b.dataset.delpj, () => renderPieces(x)); });
+}
+
+// ---------------------------------------------------------------------
+// Vue commission (imprimable)
+// ---------------------------------------------------------------------
+function renderCommission(x) {
+  const rs = rubOf(x.id); const ids = new Set(rs.map((r) => r.id));
+  const open = S.obs.filter((o) => ids.has(o.rubrique_id) && !o.levee);
+  const levees = S.obs.filter((o) => ids.has(o.rubrique_id) && o.levee).length;
+  const vis = S.visites.filter((v) => v.site_id === x.id);
+  const rubName = (rid) => { const r = S.rub.find((y) => y.id === rid); return r ? (r.lettre ? r.lettre + ' · ' : '') + r.nom : ''; };
+  $('#body').innerHTML = `
+    <div class="actions no-print"><span class="small muted">Pour la visite : imprimez cette page ou enregistrez-la en PDF.</span><button type="button" class="primary" id="print">Imprimer ou enregistrer en PDF</button></div>
+    <section style="display:flex;flex-direction:column;gap:10px"><div class="sectitle"><h3>Vérifications par rubrique</h3></div>
+    <div class="paper tablewrap"><table><thead><tr><th>Réf.</th><th>Rubrique</th><th>Dernier</th><th>Intervenant</th><th>Résultat</th><th>Obs. à lever</th><th>Prochain</th><th>PJ</th></tr></thead><tbody>
+    ${rs.map((r) => `<tr><td class="code">${esc(r.lettre)}</td><td><b>${esc(r.nom)}</b>${r.reference ? `<br><span class="small muted">Réf. ${esc(r.reference)}</span>` : ''}</td><td class="num">${fr(r.dernier)}</td><td>${esc(r.intervenant) || '—'}</td><td>${resLabel[r.resultat || '']}</td><td class="num">${openObs(r.id).length || 'Aucune'}</td><td class="num">${fr(r.prochain)}</td><td class="num">${piecesOf(r.id).length || '—'}</td></tr>`).join('') || '<tr><td colspan="8" class="muted">Aucune rubrique.</td></tr>'}
+    </tbody></table></div></section>
+    <section style="display:flex;flex-direction:column;gap:10px"><div class="sectitle"><h3>Observations en cours</h3><span class="small muted num">${open.length}</span></div>
+    ${open.length ? `<div class="paper tablewrap"><table><thead><tr><th>Rubrique</th><th>Observation</th><th>Relevée le</th></tr></thead><tbody>${open.map((o) => `<tr><td>${esc(rubName(o.rubrique_id))}</td><td>${esc(o.texte)}</td><td class="num">${fr(o.cree_le)}</td></tr>`).join('')}</tbody></table></div>` : '<div class="paper empty small">Aucune observation en attente.</div>'}
+    <p class="small muted" style="margin:0">${levees} observation${levees > 1 ? 's' : ''} levée${levees > 1 ? 's' : ''} au total.</p></section>
+    <section style="display:flex;flex-direction:column;gap:10px"><div class="sectitle"><h3>Passages d'entreprises extérieures</h3><span class="small muted num">${vis.length}</span></div>
+    ${vis.length ? `<div class="paper tablewrap"><table><thead><tr><th>Date</th><th>Réf.</th><th>Entreprise</th><th>Intervenant</th><th>Objet</th><th>Résultat</th><th>Signature</th><th>Visé par</th></tr></thead><tbody>${vis.map((v) => { const rr = S.rub.find((y) => y.id === v.rubrique_id); const url = S.urls[v.signature];
+      return `<tr><td class="num">${fr(v.date_visite)}</td><td class="code">${esc(rr?.lettre || '')}</td><td>${esc(v.entreprise)}</td><td>${esc(v.intervenant)}</td><td>${esc(v.objet)}</td><td>${resLabel[v.resultat || '']}</td><td>${url ? `<img class="sigimg" src="${esc(url)}" alt="Signature">` : '—'}</td><td>${esc(nameOf(v.vise_par)) || '—'}</td></tr>`; }).join('')}</tbody></table></div>` : '<div class="paper empty small">Aucun passage signé.</div>'}</section>
+    <section class="paper sign"><div><span class="eyebrow">Exploitant ou représentant</span><p class="small muted" style="margin:4px 0 0">Je soussigné(e), nom, prénom, fonction, atteste l'exactitude des informations du présent registre. « Certifié conforme »</p><div class="line"></div></div><div><span class="eyebrow">Date et signature</span><div class="line" style="margin-top:44px"></div></div></section>`;
+  $('#print').onclick = () => window.print();
+}
+
+// ---------------------------------------------------------------------
+// Accès (administrateur)
+// ---------------------------------------------------------------------
+const ROLE = { secteur: 'Responsable de secteur', responsable: 'Responsable d\'installation', agent: 'Agent d\'entretien' };
+function renderAcces() {
+  const people = Object.values(S.people).filter((p) => p.active).sort((a, b) => (a.role === 'secteur' ? -1 : 0) - (b.role === 'secteur' ? -1 : 0) || a.full_name.localeCompare(b.full_name));
+  const stockSite = (n) => ({ 1: 'Mandela', 2: 'Aar' }[n] || '');
+  main.innerHTML = `
+    <div class="sectitle"><h2>Accès aux registres</h2></div>
+    <div class="notice">Seules les personnes cochées ici entrent dans l'application, et seulement sur les sites cochés. Elles se connectent avec leur compte Stock Entretien. Une personne sans compte le crée d'abord dans Stock Entretien, puis vous validez son compte là-bas avant de cocher ses sites ici.</div>
+    <div class="paper">${people.map((p) => p.role === 'secteur'
+      ? `<div class="person"><div><b>${esc(p.full_name)}</b>${p.id === S.me.id ? ' (vous)' : ''}<div class="small muted">${ROLE.secteur} · administrateur, accès à tous les registres</div></div><span class="pill p-ok">Tous les sites</span></div>`
+      : `<div class="person" data-person="${p.id}"><div style="min-width:0"><b>${esc(p.full_name)}</b><div class="small muted">${esc(ROLE[p.role] || '')}${stockSite(p.stock_site) ? ' · ' + stockSite(p.stock_site) + ' dans Stock Entretien' : ''}</div>
+          <div class="checks">${S.sites.map((s) => `<label><input type="checkbox" value="${s.id}" ${(p.sites || []).includes(s.id) ? 'checked' : ''}>${esc(s.court)}</label>`).join('')}</div></div>
+          <button type="button" data-save="${p.id}">Enregistrer</button></div>`).join('') || '<div class="empty">Aucun compte actif.</div>'}</div>`;
+  $$('[data-save]').forEach((b) => { b.onclick = async () => {
+    const id = b.dataset.save; const row = $(`[data-person="${id}"]`);
+    const sites = $$('input:checked', row).map((i) => i.value);
+    busy(b, true);
+    const { error } = sites.length ? await S.sb.from('reg_acces').upsert({ user_id: id, sites }) : await S.sb.from('reg_acces').delete().eq('user_id', id);
+    busy(b, false);
+    if (error) return toast(errMsg(error), true);
+    S.people[id].sites = sites; toast(sites.length ? 'Accès enregistré' : 'Accès retiré');
+  }; });
+}
+
+// ---------------------------------------------------------------------
+// Connexion
+// ---------------------------------------------------------------------
+function authShell(html) { $('#band').hidden = true; main.innerHTML = `<div class="auth"><div style="text-align:center"><div class="seal" style="margin:0 auto 10px;border-color:var(--navy);color:var(--navy)" aria-hidden="true">ERP</div><span class="eyebrow">Secteur Est</span><h2 style="font-size:1.5rem;font-weight:800">Registres de sécurité</h2></div>${html}</div>`; }
+function renderLogin() {
+  authShell(`<form class="paper" id="lf" novalidate>
+      <label for="l-email">Adresse e-mail<input type="email" id="l-email" autocomplete="email" inputmode="email" autocapitalize="none" required></label>
+      <label for="l-pw">Mot de passe<input type="password" id="l-pw" autocomplete="current-password" required></label>
+      <button type="submit" class="primary" id="l-go">Se connecter</button>
+      <p class="small muted" style="margin:0">Utilisez le même compte que pour Stock Entretien. Pas encore de compte ou mot de passe oublié : <a href="${esc(CFG.stockUrl)}">ouvrir Stock Entretien</a>.</p>
+    </form>`);
+  $('#lf').onsubmit = async (e) => {
+    e.preventDefault();
+    const email = $('#l-email').value.trim(), pw = $('#l-pw').value;
+    if (!/^\S+@\S+\.\S+$/.test(email) || !pw) return toast('Saisissez votre adresse e-mail et votre mot de passe.', true);
+    busy($('#l-go'), true);
+    const { error } = await S.sb.auth.signInWithPassword({ email, password: pw });
+    busy($('#l-go'), false);
+    if (error) return toast(errMsg(error), true);
+    afterLogin();
+  };
+}
+function renderNoAccess(title, text) {
+  authShell(`<div class="paper"><h3>${title}</h3><p style="margin:0">${text}</p>
+    <button type="button" class="primary" id="na-retry">Vérifier à nouveau</button><button type="button" id="na-out">Se déconnecter</button></div>`);
+  $('#na-retry').onclick = () => afterLogin();
+  $('#na-out').onclick = async () => { await S.sb.auth.signOut(); renderLogin(); };
+}
+async function afterLogin() {
+  const { data: { user } } = await S.sb.auth.getUser();
+  if (!user) return renderLogin();
+  main.innerHTML = '<div class="loading">Chargement des registres…</div>';
+  const [prof, mine, adm] = await Promise.all([
+    S.sb.from('profiles').select('id, full_name, role, active').eq('id', user.id).maybeSingle(),
+    S.sb.rpc('reg_mes_sites'), S.sb.rpc('reg_is_admin')]);
+  if (mine.error && /reg_mes_sites|function/i.test(mine.error.message || '')) return renderNoAccess('Base à préparer', 'La base de données des registres n\'est pas encore installée. Exécutez le script SQL fourni dans Supabase.');
+  if (prof.error || mine.error) return renderNoAccess('Connexion impossible', esc(errMsg(prof.error || mine.error)));
+  const me = prof.data;
+  if (!me || !me.active) return renderNoAccess('Compte en attente', 'Votre compte Stock Entretien n\'est pas encore validé par le responsable de secteur.');
+  S.me = me; S.admin = !!adm.data; S.mesSites = mine.data || [];
+  if (!S.mesSites.length) { S.me = null; return renderNoAccess('Accès non autorisé', 'Votre compte n\'a pas encore accès aux registres de sécurité. Demandez au responsable de secteur de vous l\'ouvrir.'); }
+  $('#who-name').textContent = me.full_name + (S.admin ? ' · administrateur' : '');
+  $('#band').hidden = false;
+  try { await loadAll(); } catch (e) { return renderNoAccess('Chargement impossible', esc(errMsg(e))); }
+  render();
+}
+$('#logout').onclick = async () => { await S.sb.auth.signOut(); S.me = null; renderLogin(); };
+
+async function boot() {
+  if (!window.supabase) { authShell('<div class="notice bad">Impossible de charger l\'application. Vérifiez la connexion Internet, puis rechargez la page.</div>'); return; }
+  S.sb = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false } });
+  const { data: { session } } = await S.sb.auth.getSession();
+  if (!session) return renderLogin();
+  afterLogin();
+}
+boot();
+})();
+</script>
+</body>
+</html>
