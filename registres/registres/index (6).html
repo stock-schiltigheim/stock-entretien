@@ -1,0 +1,1870 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1B2F4A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Registres">
+<title>Registres de sécurité</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icone-192.png">
+<link rel="apple-touch-icon" href="icone-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Public+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Registres de sécurité — registre administratif : bandeau marine, intercalaires,
+   sommaire lettré A→YZ comme le classeur papier. Téléphone d'abord. */
+:root{
+  --bg:#EEF1F5; --paper:#FFFFFF; --sunk:#F4F6F9; --fg:#141C26; --muted:#5A6676; --line:#D5DBE3;
+  --navy:#1B2F4A; --navy-fg:#FFFFFF; --navy-soft:#E4EAF2; --accent:#1F5F99; --signal:#E3A21A;
+  --t1:#1F5F99; --t2:#2F7A52; --t3:#A26A12;
+  --ok:#22704A; --ok-bg:#E2F1E8; --warn:#8A5A00; --warn-bg:#FCF0D8;
+  --bad:#A3271F; --bad-bg:#F9E1DE; --info:#1F5F99; --info-bg:#E1EBF6; --none:#5A6676; --none-bg:#EDF0F4;
+  --display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --body:"Public Sans","Segoe UI",system-ui,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0F141B; --paper:#171E28; --sunk:#1D2531; --fg:#E6EBF2; --muted:#9AA6B6; --line:#2C3644;
+  --navy:#22385A; --navy-fg:#F1F5FB; --navy-soft:#1F2B3C; --accent:#8FB3DC;
+  --t1:#8FB3DC; --t2:#82C9A2; --t3:#E8B866;
+  --ok:#82C9A2; --ok-bg:#16301F; --warn:#E8B866; --warn-bg:#352812; --bad:#F09A90; --bad-bg:#3A1A17;
+  --info:#8FB3DC; --info-bg:#1D2B3E; --none:#9AA6B6; --none-bg:#222B37; color-scheme:dark}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.5;-webkit-text-size-adjust:100%;padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
+.gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:980px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);margin:0;letter-spacing:-.01em;text-wrap:balance}
+.eyebrow{font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--muted)}
+.muted{color:var(--muted)} .small{font-size:.85rem} .num{font-variant-numeric:tabular-nums}
+[hidden]{display:none!important}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:1px solid var(--line);background:var(--paper);border-radius:6px;padding:8px 14px;min-height:42px}
+button:hover{border-color:var(--muted)}
+button:disabled{opacity:.6;cursor:progress}
+button.primary{background:var(--navy);border-color:var(--navy);color:var(--navy-fg);font-weight:600}
+button.link{border:none;background:none;padding:4px 0;min-height:0;color:var(--accent);text-decoration:underline;text-underline-offset:3px}
+button.danger{color:var(--bad)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+input,select,textarea{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:8px 10px;width:100%;min-height:42px;font-size:16px}
+label{display:flex;flex-direction:column;gap:4px;font-size:.8rem;color:var(--muted);font-weight:500;min-width:0}
+a{color:var(--accent)}
+
+/* bandeau */
+.band{background:var(--navy);color:var(--navy-fg);padding-top:calc(16px + env(safe-area-inset-top,0px))}
+.brandrow{display:flex;gap:12px;align-items:center;justify-content:space-between}
+.brand{display:flex;gap:12px;align-items:center;min-width:0}
+.seal{flex:0 0 auto;width:42px;height:42px;border:2px solid var(--navy-fg);border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:.72rem}
+.band .eyebrow{color:var(--navy-fg);opacity:.85}
+.band h1{font-size:1.3rem;font-weight:800;line-height:1.15}
+.who{font-size:.8rem;text-align:right;line-height:1.3}
+@media (max-width:600px){.band .eyebrow{display:none}.band h1{font-size:1.1rem}.seal{width:36px;height:36px;font-size:.62rem}.who{font-size:.74rem}}
+.who button{background:transparent;border:1px solid rgba(255,255,255,.4);color:var(--navy-fg);min-height:32px;padding:3px 10px;font-size:.8rem;margin-top:4px}
+.dividers{display:flex;gap:6px;overflow-x:auto;margin-top:14px;scrollbar-width:none}
+.dividers::-webkit-scrollbar{display:none}
+.dividers a{flex:0 0 auto;border-radius:8px 8px 0 0;background:rgba(255,255,255,.12);color:var(--navy-fg);text-decoration:none;
+  padding:9px 15px 8px;min-height:44px;display:flex;flex-direction:column;line-height:1.2;position:relative}
+.dividers .tn{font-family:var(--display);font-weight:700;font-size:.9rem}
+.dividers .ts{font-size:.7rem;opacity:.85}
+.dividers a[aria-current="page"]{background:var(--bg);color:var(--fg)}
+.dividers a[aria-current="page"] .ts{color:var(--muted);opacity:1}
+.dividers .dot{position:absolute;top:0;left:14px;width:22px;height:4px;border-radius:0 0 3px 3px}
+
+main{display:flex;flex-direction:column;gap:20px;padding-top:20px}
+.paper{background:var(--paper);border:1px solid var(--line);border-radius:10px}
+.notice{padding:12px 14px;border-radius:8px;background:var(--info-bg);color:var(--info);font-size:.9rem}
+.notice.warn{background:var(--warn-bg);color:var(--warn)} .notice.bad{background:var(--bad-bg);color:var(--bad)}
+.empty{padding:26px 16px;text-align:center;color:var(--muted)}
+.loading{padding:40px 16px;text-align:center;color:var(--muted)}
+.sectitle{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.sectitle h2{font-size:1.15rem;font-weight:800}
+.sectitle h3{font-size:1.02rem;font-weight:700}
+h4{margin:0;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.addrow{display:flex;gap:8px} .addrow input{flex:1;min-width:0}
+
+/* page de garde */
+.cover{overflow:hidden}
+.cover-top{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;align-items:flex-end;padding:18px 20px 16px;border-top:6px solid var(--sc,var(--navy))}
+.cover-top h2{font-size:1.4rem;font-weight:800;line-height:1.15;margin-top:3px}
+.seg{display:flex;gap:2px;background:var(--sunk);padding:3px;border-radius:8px;border:1px solid var(--line);flex-wrap:wrap}
+.seg a{border-radius:6px;padding:7px 12px;font-weight:500;text-decoration:none;color:var(--fg);font-size:.9rem}
+@media (max-width:600px){.cover-top{flex-direction:column;align-items:stretch}.seg{display:grid;grid-template-columns:repeat(4,1fr)}.seg a{text-align:center;padding:8px 4px;font-size:.84rem}.seg .long{display:none}}
+.seg .short{display:none}@media (max-width:600px){.seg .short{display:inline}}
+.seg a[aria-current="page"]{background:var(--navy);color:var(--navy-fg)}
+.fichebox summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;gap:10px;padding:11px 20px;border-top:1px solid var(--line);font-weight:600;font-size:.88rem}
+.fichebox summary::-webkit-details-marker{display:none}
+.fichebox summary::after{content:"▾";color:var(--muted)}
+.fichebox[open] summary::after{content:"▴"}
+.fiche{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));border-top:1px solid var(--line)}
+.fiche>label,.fiche>div{padding:11px 20px;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.fiche input,.fiche select{border:none;border-bottom:1px dashed var(--line);border-radius:0;padding:3px 0;min-height:32px;background:transparent;font-weight:600}
+.fiche input:focus,.fiche select:focus{border-bottom-color:var(--accent);outline:none}
+.fiche .val{font-weight:600;margin-top:3px;color:var(--fg)}
+.strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--line)}
+.tile{border:none;border-right:1px solid var(--line);border-radius:0;padding:13px 18px;background:transparent;text-align:left;display:flex;flex-direction:column;gap:2px}
+.tile:last-child{border-right:none}
+.tile .n{font-family:var(--display);font-size:1.6rem;font-weight:800;line-height:1.1}
+.tile .l{font-size:.76rem;color:var(--muted);font-weight:500}
+.tile[aria-pressed="true"]{background:var(--navy-soft);box-shadow:inset 0 -3px 0 var(--navy)}
+.tile.ok .n{color:var(--ok)} .tile.proche .n{color:var(--info)} .tile.retard .n{color:var(--bad)} .tile.obs .n{color:var(--warn)}
+@media (max-width:600px){.strip{grid-template-columns:repeat(2,minmax(0,1fr))}.tile:nth-child(2){border-right:none}.tile:nth-child(-n+2){border-bottom:1px solid var(--line)}}
+
+/* sommaire lettré */
+.toc{overflow:hidden}
+.toc-cols,.rowhead{display:grid;grid-template-columns:58px minmax(0,1fr) 105px 105px 160px;align-items:center}
+.toc-cols{background:var(--navy);color:var(--navy-fg);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;font-weight:700}
+.toc-cols span{padding:9px 12px}
+.row{border-top:1px solid var(--line)} .row:first-child{border-top:none}
+.rowhead{width:100%;border:none;border-radius:0;background:transparent;padding:0;text-align:left;min-height:58px}
+.rowhead:hover{background:var(--sunk)}
+.rowhead[aria-expanded="true"]{background:var(--navy-soft)}
+.rowhead>span{padding:10px 12px}
+.letter{align-self:stretch;display:flex!important;align-items:center;justify-content:center;font-family:var(--display);font-weight:800;font-size:1.02rem;border-right:1px solid var(--line);background:var(--sunk)}
+.s-retard .letter{box-shadow:inset 4px 0 0 var(--bad)} .s-obs .letter{box-shadow:inset 4px 0 0 var(--warn)} .s-proche .letter{box-shadow:inset 4px 0 0 var(--info)} .s-ok .letter{box-shadow:inset 4px 0 0 var(--ok)}
+.rname{font-weight:600}
+.rdetail{display:block;font-size:.8rem;color:var(--muted)}
+.rmeta{display:none;font-size:.8rem;color:var(--muted);margin-top:3px}
+.clip{font-size:.76rem;color:var(--muted);font-weight:500;margin-left:6px;white-space:nowrap}
+.cell{font-size:.86rem}
+.pill{display:inline-block;font-size:.72rem;font-weight:700;padding:3px 8px;border-radius:4px;white-space:nowrap}
+.p-ok{background:var(--ok-bg);color:var(--ok)} .p-proche{background:var(--info-bg);color:var(--info)} .p-retard{background:var(--bad-bg);color:var(--bad)} .p-obs{background:var(--warn-bg);color:var(--warn)} .p-vide{background:var(--none-bg);color:var(--none)}
+@media (max-width:700px){.toc-cols{display:none}.rowhead{grid-template-columns:50px minmax(0,1fr)}.rowhead .cell{display:none}.rmeta{display:block}}
+.panel{padding:16px 18px 20px 70px;display:flex;flex-direction:column;gap:16px;border-top:1px dashed var(--line)}
+@media (max-width:700px){.panel{padding:14px 14px 18px}}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.obslist,.pjlist{display:flex;flex-direction:column;margin:0;padding:0;list-style:none;gap:6px}
+.ob{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:start;padding:9px 12px;border-radius:6px;background:var(--sunk);border:1px solid var(--line)}
+.ob input{width:20px;height:20px;min-height:0;margin-top:2px}
+.ob.done .t{text-decoration:line-through;color:var(--muted)}
+.pj{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:6px;background:var(--paper)}
+.ftype{display:grid;place-items:center;height:30px;border-radius:4px;border:1.5px solid var(--accent);color:var(--accent);font-family:var(--display);font-weight:800;font-size:.66rem}
+.pj a{font-weight:600;overflow-wrap:anywhere;text-underline-offset:3px}
+.pj .m{display:block;font-size:.78rem;color:var(--muted);overflow-wrap:anywhere}
+.pjgroup{display:flex;align-items:center;gap:10px;padding:8px 2px 2px;font-weight:600;font-size:.88rem}
+.pjgroup .code{font-family:var(--display);font-weight:800;min-width:28px}
+.box{padding:16px 20px;display:flex;flex-direction:column;gap:12px}
+input[type=file]{padding:6px;font-size:.85rem}
+
+/* passages signés */
+.visit{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:6px;background:var(--paper)}
+.visit .m{display:block;font-size:.78rem;color:var(--muted)}
+.sigimg{height:46px;max-width:150px;background:#fff;border:1px solid var(--line);border-radius:4px;padding:2px;object-fit:contain}
+.visitform{border:1.5px solid var(--navy);border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:12px;background:var(--paper)}
+.visitform textarea{min-height:70px;resize:vertical}
+.attest{font-size:.86rem;background:var(--sunk);border-left:3px solid var(--navy);padding:9px 12px}
+.padwrap{position:relative}
+.pad{display:block;width:100%;height:190px;background:#fff;border:1.5px dashed #8A96A8;border-radius:8px;touch-action:none;cursor:crosshair}
+.padhint{position:absolute;left:0;right:0;bottom:12px;text-align:center;font-size:.8rem;color:#8A96A8;pointer-events:none}
+.padline{position:absolute;left:8%;right:8%;bottom:38px;border-bottom:1px solid #C3CAD6;pointer-events:none}
+.chk{flex-direction:row;align-items:flex-start;gap:8px;color:var(--fg);font-size:.88rem}
+.chk input{width:20px;height:20px;min-height:0;flex:0 0 auto;margin-top:1px}
+td .sigimg{height:38px}
+
+/* alertes */
+.alerts{display:flex;flex-direction:column;gap:6px}
+.alert{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 12px;border-radius:8px;text-decoration:none;color:inherit;border:1px solid transparent}
+.alert.rouge{background:var(--bad-bg);border-color:var(--bad)} .alert.rouge .ic{color:var(--bad)}
+.alert.orange{background:var(--warn-bg)} .alert.orange .ic{color:var(--warn)}
+.alert .ic{font-weight:800;font-family:var(--display);font-size:1.05rem;width:22px;text-align:center}
+.alert .go{font-size:.8rem;color:var(--muted);white-space:nowrap}
+.badge{display:inline-block;min-width:18px;padding:0 5px;border-radius:9px;background:var(--bad);color:#fff;font-size:.68rem;font-weight:700;text-align:center;margin-left:4px;vertical-align:1px}
+.p-nc{background:var(--bad);color:#fff}
+/* équipements (BAES, extincteurs) */
+.daelist{display:flex;flex-direction:column}
+.daerow{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 16px;border-top:1px solid var(--line);text-decoration:none;color:inherit}
+.daerow:first-child{border-top:none}
+.daerow:hover{background:var(--sunk)}
+.daecode{font-family:var(--display);font-weight:800;font-size:.9rem;border:1.5px solid var(--fg);border-radius:6px;padding:4px 8px;white-space:nowrap}
+.checks2{display:flex;flex-direction:column;gap:8px}
+.ck{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--paper)}
+.ck .opts{display:flex;gap:6px}
+.ck .opts button{min-height:40px;padding:6px 12px;font-weight:600}
+.ck .opts button[aria-pressed="true"].yes{background:var(--ok);border-color:var(--ok);color:#fff}
+.ck .opts button[aria-pressed="true"].no{background:var(--bad);border-color:var(--bad);color:#fff}
+.ck.bad{border-color:var(--bad)}
+.qrbox{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.qrbox .qr{width:120px;height:120px;background:#fff;padding:6px;border-radius:6px;border:1px solid var(--line)}
+.qr svg{width:100%;height:100%;display:block}
+.labels{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.label{display:grid;grid-template-columns:110px minmax(0,1fr);gap:12px;align-items:center;padding:12px;border:2px solid #0E7A3A;border-radius:10px;background:#fff;color:#111;break-inside:avoid}
+.label .qr{width:110px;height:110px}
+.label .t1{font-family:var(--display);font-weight:800;color:#0E7A3A;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase}
+.label .t2{font-family:var(--display);font-weight:800;font-size:1.25rem;line-height:1.1}
+.label .t3{font-size:.82rem}
+.label .t4{font-size:.72rem;color:#444;margin-top:4px}
+.yearsel{width:auto;min-width:120px;font-weight:700}
+.dl{border:none;background:none;min-height:0;padding:4px 0;color:var(--accent);font-weight:600;text-decoration:underline;text-underline-offset:3px}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0}
+@media (max-width:600px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media print{.labels{grid-template-columns:repeat(2,1fr);gap:8mm}.label{border-width:1.5px}}
+.small-labels{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+.small-labels .label{grid-template-columns:84px minmax(0,1fr);gap:8px;padding:8px}
+.small-labels .label .qr{width:84px;height:84px}
+.small-labels .label .t2{font-size:.95rem;white-space:nowrap;letter-spacing:-.01em}
+.small-labels .label .t1{font-size:.62rem;letter-spacing:.04em}
+@media (max-width:600px){.daerow{grid-template-columns:auto minmax(0,1fr)}.daerow>.pill{grid-column:2;justify-self:start}}
+@media print{.small-labels{grid-template-columns:repeat(3,1fr);gap:4mm}}
+
+/* photos */
+.eqthumb{width:44px;height:44px;border-radius:6px;object-fit:cover;border:1px solid var(--line);background:var(--sunk);flex:0 0 auto}
+.eqphoto{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;padding:14px 20px;border-top:1px solid var(--line)}
+.eqphoto img{width:180px;max-width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;border:1px solid var(--line);background:var(--sunk)}
+.eqphoto .ph-empty{width:180px;max-width:100%;aspect-ratio:4/3;border:1.5px dashed var(--line);border-radius:8px;display:grid;place-items:center;color:var(--muted);font-size:.85rem;text-align:center;padding:8px}
+.photobtn{position:relative;overflow:hidden;display:inline-flex;align-items:center;gap:6px;cursor:pointer;border:1px solid var(--line);background:var(--paper);border-radius:6px;padding:8px 14px;min-height:42px;font-weight:600;color:var(--fg)}
+.photobtn input{position:absolute;inset:0;opacity:0;cursor:pointer;min-height:0}
+.ckphoto{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.ckphoto img{width:72px;height:54px;object-fit:cover;border-radius:6px;border:1px solid var(--line)}
+
+/* scanner */
+.fab{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:15;border:none;border-radius:30px;min-height:58px;padding:0 22px;background:var(--navy);color:var(--navy-fg);font-weight:800;font-size:1.02rem;box-shadow:0 4px 16px rgba(0,0,0,.28);display:inline-flex;align-items:center;gap:8px;text-decoration:none}
+.scanbox{position:relative;width:100%;max-width:420px;aspect-ratio:1;background:#000;border-radius:12px;overflow:hidden;margin:0 auto}
+.scanbox video{width:100%;height:100%;object-fit:cover;display:block}
+.scanframe{position:absolute;inset:16%;border:3px solid #fff;border-radius:14px;box-shadow:0 0 0 999px rgba(0,0,0,.35);pointer-events:none}
+.quick{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.quick button{min-height:76px;font-size:1.15rem;font-weight:800;border-radius:10px}
+.quick .qok{background:var(--ok);border-color:var(--ok);color:#fff}
+.quick .qko{background:var(--bad);border-color:var(--bad);color:#fff}
+.fabs{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:15;display:flex;gap:10px}
+.fabs .fab{position:static}
+.fab.alt{background:var(--paper);color:var(--fg);border:1px solid var(--line)}
+.cam{position:fixed;inset:0;z-index:50;background:#000;display:flex;flex-direction:column}
+.cam video{flex:1;min-height:0;width:100%;object-fit:contain;background:#000}
+.cam .cambar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px calc(14px + env(safe-area-inset-bottom,0px));background:#000}
+.cam .cambar button{min-height:48px;background:transparent;color:#fff;border:1px solid rgba(255,255,255,.5);border-radius:8px;padding:0 14px;font-weight:600}
+.cam .shoot{width:74px;height:74px;min-height:74px!important;border-radius:50%!important;background:#fff!important;border:5px solid rgba(255,255,255,.45)!important;background-clip:padding-box!important;padding:0!important;flex:none}
+.cam .cammsg{color:#fff;text-align:center;padding:10px 16px;font-size:.92rem}
+.numin{font-size:1.6rem!important;font-weight:800;text-align:center;letter-spacing:.04em;min-height:62px}
+.numres .daerow{grid-template-columns:auto 1fr auto}
+@media print{.fab,.fabs{display:none!important}}
+/* planches d'étiquettes A4 */
+.sheets{display:flex;flex-direction:column;align-items:center;gap:16px}
+.sheet{width:210mm;height:297mm;background:#fff;color:#111;display:grid;box-shadow:0 2px 10px rgba(0,0,0,.18);overflow:hidden;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.sheet.f18{grid-template-columns:repeat(3,70mm);grid-template-rows:repeat(6,49.5mm);--q:34mm;--pad:4mm}
+.sheet.f24{grid-template-columns:repeat(3,70mm);grid-template-rows:repeat(8,37.125mm);--q:29mm;--pad:3.5mm}
+.sheet.f40{grid-template-columns:repeat(4,52.5mm);grid-template-rows:repeat(10,29.7mm);--q:22mm;--pad:2.5mm}
+.cell{display:flex;align-items:center;gap:2.2mm;padding:var(--pad);overflow:hidden;min-width:0;line-height:1.15;font-family:var(--body)}
+.sheet.cut .cell{outline:.2mm dashed #b5b5b5;outline-offset:-.1mm}
+.cell .q{flex:none;width:var(--q);height:var(--q)}
+.cell .q svg{width:100%;height:100%;display:block}
+.cell .tx{min-width:0;flex:1;display:flex;flex-direction:column;gap:.6mm}
+.cell .c1{font-family:var(--display);font-weight:800;text-transform:uppercase;letter-spacing:.03em}
+.cell .c2{font-family:var(--display);font-weight:800;white-space:nowrap;letter-spacing:-.01em}
+.cell .c3{overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;color:#222}
+.cell .c4{color:#555}
+.f18 .c1{font-size:7pt}.f18 .c2{font-size:12.5pt}.f18 .c3{font-size:7.5pt;-webkit-line-clamp:3}.f18 .c4{font-size:6.5pt}
+.f24 .c1{font-size:6pt}.f24 .c2{font-size:10.5pt}.f24 .c3{font-size:6.5pt}.f24 .c4{font-size:5.5pt}
+.f40 .c1{font-size:5pt}.f40 .c2{font-size:7pt;letter-spacing:-.03em}.f40 .c3{font-size:5.5pt;-webkit-line-clamp:2}.f40 .c4{display:none}
+.lbopts{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.lbopts label{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:.9rem}
+.lbopts input[type=number]{width:70px}
+.lbopts input[type=checkbox]{width:auto;min-height:0}
+#printsheets{display:none}
+@media print{
+  body.printing-labels>*:not(#printsheets){display:none!important}
+  body.printing-labels #printsheets{display:block}
+  body.printing-labels #printsheets .sheets{display:block;zoom:1!important}
+  body.printing-labels .sheet{box-shadow:none;break-after:page;page-break-after:always;margin:0}
+  body.printing-labels .sheet:last-child{break-after:auto;page-break-after:auto}
+}
+
+/* tableaux */
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:.86rem}
+th,td{padding:9px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+thead th{background:var(--navy);color:var(--navy-fg);font-size:.66rem;text-transform:uppercase;letter-spacing:.1em;font-weight:700}
+tr:last-child td{border-bottom:none}
+td.code{font-family:var(--display);font-weight:800;width:52px;background:var(--sunk)}
+.sign{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;padding:18px 20px}
+.sign .line{border-bottom:1px solid var(--muted);height:60px}
+
+/* sommaire général */
+.sites{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.sitecard{text-decoration:none;color:var(--fg);display:flex;flex-direction:column;gap:12px;border-radius:10px;border:1px solid var(--line);background:var(--paper);overflow:hidden}
+.sitecard:hover{border-color:var(--muted)}
+.sitecard .top{padding:15px 18px 0;border-top:6px solid var(--sc)}
+.sitecard .name{font-family:var(--display);font-weight:800;font-size:1.12rem;display:block;margin-top:2px}
+.sitecard .counts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border-top:1px solid var(--line)}
+.sitecard .counts span{padding:9px 18px;font-size:.78rem;color:var(--muted);border-bottom:1px solid var(--line)}
+.sitecard .counts span:nth-child(odd){border-right:1px solid var(--line)}
+.sitecard .counts b{display:block;font-family:var(--display);font-size:1.25rem;font-weight:800}
+.sitecard .foot{padding:0 18px 13px;font-size:.78rem;color:var(--muted)}
+
+/* accès */
+.person{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 16px;border-top:1px solid var(--line)}
+.person:first-child{border-top:none}
+.checks{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:6px}
+.checks label{flex-direction:row;align-items:center;gap:6px;color:var(--fg);font-size:.88rem}
+.checks input{width:20px;height:20px;min-height:0}
+
+/* connexion */
+.auth{max-width:420px;margin:28px auto;display:flex;flex-direction:column;gap:14px}
+.auth .paper{padding:20px;display:flex;flex-direction:column;gap:14px}
+
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));background:var(--navy);color:var(--navy-fg);padding:10px 16px;border-radius:6px;font-size:.9rem;z-index:20;max-width:calc(100% - 32px)}
+.toast.err{background:var(--bad);color:#fff}
+@media (prefers-reduced-motion:no-preference){.panel{animation:open .18s ease-out}@keyframes open{from{opacity:.4;transform:translateY(-4px)}to{opacity:1;transform:none}}}
+
+/* impression (vue commission) */
+.print-only{display:none}
+@media print{
+  .fichebox summary{display:none!important}
+  :root{--bg:#fff;--paper:#fff;--sunk:#f1f3f6;--fg:#000;--muted:#444;--line:#999;--navy:#1B2F4A;--navy-fg:#fff;color-scheme:light}
+  body{font-size:11.5px;padding:0}
+  .band,.no-print,.toast,.seg,.strip{display:none!important}
+  .print-only{display:block}
+  main{padding-top:0;gap:12px}
+  .paper{border-color:#999}
+  table{min-width:0}
+  thead th{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  td.code{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .cover-top{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  tr{break-inside:avoid}
+  .sectitle{break-after:avoid}
+}
+</style>
+</head>
+<body>
+<header class="band no-print" id="band" hidden><div class="gut"><div class="wrap">
+  <div class="brandrow">
+    <div class="brand"><div class="seal" aria-hidden="true">ERP</div>
+      <div style="min-width:0"><span class="eyebrow">Secteur Est · Vérifications périodiques</span><h1>Registres de sécurité</h1></div></div>
+    <div class="who"><span id="who-name"></span><br><button type="button" id="logout">Se déconnecter</button></div>
+  </div>
+  <nav class="dividers" id="dividers" aria-label="Intercalaires"></nav>
+</div></div></header>
+<div class="gut"><div class="wrap"><main id="main"><div class="loading">Ouverture…</div></main></div></div>
+<div class="fabs no-print" id="fab" hidden><a href="#/num" class="fab alt">🔢 N°</a><a href="#/scan" class="fab">📷 Scanner</a></div>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+<script>
+// =====================================================================
+// Connexion : la même base que Stock Entretien (mêmes comptes)
+// =====================================================================
+window.REG_CONFIG = {
+  supabaseUrl: "https://emjvcirqslewqpyxjqbs.supabase.co",
+  supabaseAnonKey: "sb_publishable_Yy7vh7RkxNZum9gbGuzBGQ_z6wr7ndW",
+  // Adresse de l'application Stock Entretien (création de compte, mot de passe oublié)
+  stockUrl: "https://stock-schiltigheim.github.io/stock-entretien/",
+};
+</script>
+<script>
+(() => {
+'use strict';
+const CFG = window.REG_CONFIG;
+const PALETTE = ['#1F5F99', '#2F7A52', '#A26A12', '#7A3E9D', '#1C7C86', '#B3471E', '#4E5D2F', '#8C2F55', '#3E4C9A', '#6B5B2A'];
+const siteColor = (id) => { const i = S.sites.findIndex((x) => x.id === id); return PALETTE[(i < 0 ? 0 : i) % PALETTE.length]; };
+const shortName = (s) => (s.court || s.nom || '').replace(/^(Stade (de l'|du |de la |des |de )|Centre sportif |Gymnase (de l'|du |de la |des |de )?|Nelson )/i, '');
+const multiSecteur = () => new Set(S.sites.map((x) => x.secteur || 'Est')).size > 1;
+const S = { sb: null, me: null, admin: false, mesSites: [], sites: [], rub: [], obs: [], pieces: [], visites: [], visitFor: null, ctl: [], eq: [], eqCtlBy: new Map(), params: {}, annee: String(new Date().getFullYear()), pjAnnee: 'all', eqSite: 'all', eqZone: 'all', eqQ: '', eqForm: null, eqCheck: null, ronde: null, people: {}, urls: {},
+  filter: 'all', open: null, pjFilter: 'all', confirm: null, loadedAt: 0, busy: false };
+const main = document.getElementById('main');
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const today = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+const fr = (s) => { if (!s) return '—'; const [y, m, d] = String(s).slice(0, 10).split('-'); return d + '/' + m + '/' + y; };
+const days = (s) => Math.round((new Date(s + 'T12:00') - new Date(today() + 'T12:00')) / 864e5);
+const plus12 = (s) => { if (!s) return ''; const [y, m, d] = s.split('-').map(Number); const t = new Date(Date.UTC(y + 1, m - 1, d)); return t.toISOString().slice(0, 10); };
+const siteOf = (id) => S.sites.find((s) => s.id === id);
+const rubOf = (site) => S.rub.filter((r) => r.site_id === site);
+const openObs = (rid) => S.obs.filter((o) => o.rubrique_id === rid && !o.levee);
+const piecesOf = (rid) => S.pieces.filter((p) => p.rubrique_id === rid).sort((a, b) => b.ajoute_le.localeCompare(a.ajoute_le));
+const visitesOf = (rid) => S.visites.filter((v) => v.rubrique_id === rid);
+const nameOf = (id) => (id && S.people[id]?.full_name) || '';
+const resLabel = { conforme: 'Conforme', observations: 'Avec observations', non_conforme: 'Non conforme', '': '—' };
+const RES_OPTS = (v) => ['', 'conforme', 'observations', 'non_conforme'].map((k) => `<option value="${k}" ${v === k ? 'selected' : ''}>${k ? resLabel[k] : 'Non renseigné'}</option>`).join('');
+const avisLabel = (a) => ({ favorable: 'Favorable', defavorable: 'Défavorable' }[a] || '—');
+const TYPES = { 'application/pdf': 'PDF', 'image/jpeg': 'JPG', 'image/png': 'PNG', 'image/webp': 'IMG' };
+const ACCEPT = '.pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp';
+const fmtSize = (b) => (!b ? '' : b >= 1048576 ? (b / 1048576).toFixed(1).replace('.', ',') + ' Mo' : Math.max(1, Math.round(b / 1024)) + ' Ko');
+
+function toast(msg, err) { const t = $('#toast'); t.textContent = msg; t.className = 'toast' + (err ? ' err' : ''); t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => { t.hidden = true; }, err ? 4200 : 2400); }
+function errMsg(e) {
+  const m = (e && (e.message || e.error_description || e.error)) || String(e || '');
+  if (/Invalid login credentials/i.test(m)) return 'Adresse e-mail ou mot de passe incorrect.';
+  if (/row-level security|permission denied/i.test(m)) return 'Vous n\'avez pas l\'autorisation de faire cette modification.';
+  if (/Failed to fetch|NetworkError|Load failed/i.test(m)) return 'Pas de connexion Internet. Réessayez.';
+  if (/exceeded the maximum allowed size|Payload too large/i.test(m)) return 'Fichier trop lourd : 20 Mo maximum.';
+  if (/mime type|invalid_mime/i.test(m)) return 'Format refusé : PDF, JPG, PNG ou WEBP uniquement.';
+  return m || 'Une erreur est survenue.';
+}
+function busy(btn, on) { if (btn) btn.disabled = on; }
+function statut(r) {
+  const n = openObs(r.id).length;
+  if (!r.dernier && !r.prochain) return { k: 'vide', l: 'À renseigner' };
+  if (r.resultat === 'non_conforme') return { k: 'retard', l: 'Non conforme' };
+  if (r.prochain && r.prochain < today()) return { k: 'retard', l: 'En retard' };
+  if (n > 0) return { k: 'obs', l: n + (n > 1 ? ' observations' : ' observation') + ' à lever' };
+  if (r.prochain && days(r.prochain) <= 60) return { k: 'proche', l: 'Échéance dans ' + days(r.prochain) + ' j' };
+  return { k: 'ok', l: 'À jour' };
+}
+function counts(site) {
+  const rs = rubOf(site); const st = rs.map(statut); const c = (k) => st.filter((x) => x.k === k).length;
+  const ids = new Set(rs.map((r) => r.id));
+  return { total: rs.length, ok: c('ok'), proche: c('proche'), retard: c('retard'), obs: S.obs.filter((o) => !o.levee && ids.has(o.rubrique_id)).length };
+}
+
+// ---------------------------------------------------------------------
+// Données
+// ---------------------------------------------------------------------
+async function loadAll() {
+  const sb = S.sb;
+  const [sites, rub, obs, pieces, people, visites] = await Promise.all([
+    sb.from('reg_sites').select('*').order('ordre'),
+    sb.from('reg_rubriques').select('*').order('ordre').order('created_at'),
+    sb.from('reg_observations').select('*').order('cree_le'),
+    sb.from('reg_pieces').select('*'),
+    sb.rpc('reg_personnes'),
+    sb.from('reg_visites').select('*').order('date_visite', { ascending: false }),
+  ]);
+  for (const r of [sites, rub, obs, pieces, people, visites]) if (r.error) throw r.error;
+  const [ctl, eq, eqCtl, params] = await Promise.all([
+    sb.from('reg_controles').select('*').order('date_controle', { ascending: false }),
+    sb.from('reg_equipements').select('*').order('code'),
+    sb.from('reg_equip_controles').select('*').order('date_controle', { ascending: false }),
+    sb.from('reg_parametres').select('*').maybeSingle(),
+  ]);
+  S.v2 = !ctl.error && !eq.error;
+  S.ctl = ctl.data || []; S.eq = eq.data || []; S.eqCtlAll = eqCtl.data || []; S.params = params.data || {}; indexEq();
+  S.visites = visites.data;
+  S.sites = sites.data; S.rub = rub.data; S.obs = obs.data; S.pieces = pieces.data;
+  S.people = Object.fromEntries((people.data || []).map((p) => [p.id, p]));
+  S.urls = {};
+  const paths = [...S.pieces.map((p) => p.chemin), ...S.visites.map((v) => v.signature), ...S.eq.map((e) => e.photo).filter(Boolean), ...(S.eqCtlAll || []).map((c) => c.photo).filter(Boolean)];
+  if (paths.length) {
+    const { data } = await sb.storage.from('registres').createSignedUrls(paths, 3600);
+    (data || []).forEach((d) => { if (d.signedUrl) S.urls[d.path] = d.signedUrl; });
+  }
+  S.loadedAt = Date.now();
+}
+async function reload() {
+  try { await loadAll(); } catch (e) { toast(errMsg(e), true); }
+  render();
+}
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && S.me && Date.now() - S.loadedAt > 60000 && !editing() && !S.visitFor) reload();
+});
+function editing() { const a = document.activeElement; return a && main.contains(a) && /INPUT|SELECT|TEXTAREA/.test(a.tagName); }
+
+// ---------------------------------------------------------------------
+// Navigation : #/sommaire, #/site/<id>[/pieces|/commission], #/acces
+// ---------------------------------------------------------------------
+function route() {
+  const p = location.hash.replace(/^#\/?/, '').split('/');
+  if (p[0] === 'site' && S.mesSites.includes(p[1])) return { v: 'site', site: p[1], mode: ['pieces', 'commission', 'historique'].includes(p[2]) ? p[2] : 'registre' };
+  if (p[0] === 'acces' && S.admin) return { v: 'acces' };
+  if (p[0] === 'sauvegarde' && S.admin) return { v: 'sauvegarde' };
+  if (p[0] === 'scan') return { v: 'scan' };
+  if (p[0] === 'num') return { v: 'num' };
+  if (p[0] === 'e' && p[1]) return { v: 'eqfiche', id: p[1] };
+  if (p[0] === 'eq' && CATS[p[1]]) return { v: 'eq', cat: p[1] };
+  if (p[0] === 'ronde' && CATS[p[1]]) return { v: 'ronde', cat: p[1] };
+  if (p[0] === 'etiquettes' && CATS[p[1]]) return { v: 'etiquettes', cat: p[1], id: p[2] || '' };
+  if (p[0] === 'sommaire' && (S.admin || S.mesSites.length > 1)) return { v: 'sommaire' };
+  return S.admin || S.mesSites.length > 1 ? { v: 'sommaire' } : { v: 'site', site: S.mesSites[0], mode: 'registre' };
+}
+let lastKey = '';
+window.addEventListener('hashchange', () => {
+  const r = route(); const key = r.v + (r.site || '') + (r.id || '') + (r.cat || '');
+  if (key !== lastKey) { S.filter = 'all'; S.open = null; S.pjFilter = 'all'; S.visitFor = null; S.eqForm = null; S.eqCheck = null; if (r.v !== 'ronde') S.ronde = null; window.scrollTo(0, 0); }
+  S.confirm = null; render();
+});
+
+function renderTabs(r) {
+  const tabs = [];
+  if (S.admin || S.mesSites.length > 1) tabs.push({ href: '#/sommaire', n: 'Sommaire', s: S.admin ? 'Supervision' : 'Mes sites', cur: r.v === 'sommaire' });
+  S.sites.forEach((x) => { const c = counts(x.id); tabs.push({ href: '#/site/' + x.id, n: x.court, s: c.ok + ' / ' + c.total + ' à jour', cur: r.site === x.id, color: siteColor(x.id) }); });
+  const nAl = alertes().filter((a) => a.niveau === 'rouge').reduce((t, a) => t + (a.n || 1), 0);
+  if (tabs[0] && tabs[0].href === '#/sommaire') tabs[0].badge = nAl;
+  const AL = alertes();
+  S.sites.forEach((x) => { const t = tabs.find((y) => y.href === '#/site/' + x.id); if (t) t.badge = AL.filter((a) => a.niveau === 'rouge' && a.site === x.id && !a.cat).length; });
+  const curCat = r.cat || (r.v === 'eqfiche' ? S.eq.find((e) => e.id === r.id)?.categorie : '');
+  for (const [k, C] of Object.entries(CATS)) { const n = S.eq.filter((e) => e.categorie === k).length;
+    tabs.push({ href: '#/eq/' + k, n: C.court, s: n + ' ' + (n > 1 ? C.plur : C.un), cur: curCat === k, color: C.color, badge: AL.filter((a) => a.cat === k && a.niveau === 'rouge').reduce((t, a) => t + (a.n || 1), 0) }); }
+  if (S.v2 && S.eq.length) tabs.push({ href: '#/num', n: '🔢 Par numéro', s: 'Recherche rapide', cur: r.v === 'num' });
+  if (S.admin) tabs.push({ href: '#/acces', n: 'Accès', s: 'Qui peut entrer', cur: r.v === 'acces' });
+  if (S.admin) tabs.push({ href: '#/sauvegarde', n: 'Réglages', s: S.params.derniere_sauvegarde ? 'Le ' + fr(S.params.derniere_sauvegarde) : 'Jamais faite', cur: r.v === 'sauvegarde' });
+  $('#dividers').innerHTML = tabs.map((t) => `<a href="${t.href}" ${t.cur ? 'aria-current="page"' : ''}>${t.color ? `<span class="dot" style="background:${t.color}"></span>` : ''}<span class="tn">${esc(t.n)}${t.badge ? `<span class="badge">${t.badge}</span>` : ''}</span><span class="ts num">${esc(t.s)}</span></a>`).join('');
+}
+
+function render() {
+  if (!S.me) return;
+  const r = route(); lastKey = r.v + (r.site || '') + (r.id || '') + (r.cat || '');
+  renderTabs(r);
+  $('#fab').hidden = !(S.v2 && S.eq.length) || r.v === 'scan' || r.v === 'num' || r.v === 'eqfiche' || r.v === 'ronde';
+  if (r.v !== 'scan') stopScan();
+  if (r.v !== 'etiquettes') { const lp = $('#lbpage'); if (lp) lp.remove(); }
+  if (r.v === 'scan') return renderScan();
+  if (r.v === 'num') return renderNum();
+  if (r.v === 'sommaire') return renderSommaire();
+  if (r.v === 'acces') return renderAcces();
+  if (r.v === 'sauvegarde') return renderSauvegarde();
+  if (r.v === 'eq') return renderEq(r.cat);
+  if (r.v === 'eqfiche') return renderEqFiche(r.id);
+  if (r.v === 'ronde') return renderRonde(r.cat);
+  if (r.v === 'etiquettes') return renderEtiquettes(r.cat, r.id);
+  return renderSite(r.site, r.mode);
+}
+
+// ---------------------------------------------------------------------
+// Sommaire (supervision)
+// ---------------------------------------------------------------------
+function renderSommaire() {
+  const ids = new Set(S.rub.map((r) => r.id));
+  const allObs = S.obs.filter((o) => !o.levee && ids.has(o.rubrique_id)).length;
+  const rows = S.rub.filter((r) => r.prochain).sort((a, b) => a.prochain.localeCompare(b.prochain)).slice(0, 12);
+  main.innerHTML = `
+    <div class="sectitle"><h2>${S.admin ? 'Tableau de supervision' : 'Mes registres'}</h2><span class="small muted num">au ${fr(today())}</span></div>
+    ${alertesHTML(alertes(), 'Alertes')}
+    ${[...new Set(S.sites.map((x) => x.secteur || 'Est'))].map((sec) => `${multiSecteur() ? `<div class="sectitle"><h3>Secteur ${esc(sec)}</h3></div>` : ''}<div class="sites">${S.sites.filter((x) => (x.secteur || 'Est') === sec).map((x) => { const c = counts(x.id); return `<a class="sitecard" style="--sc:${siteColor(x.id)}" href="#/site/${x.id}">
+      <span class="top"><span class="eyebrow">${esc([x.type_erp ? 'ERP type ' + x.type_erp : '', x.categorie].filter(Boolean).join(' · ') || 'Fiche à compléter')}</span><span class="name">${esc(x.nom)}</span></span>
+      <span class="counts num"><span><b style="color:var(--ok)">${c.ok} / ${c.total}</b>rubriques à jour</span><span><b style="color:var(--bad)">${c.retard}</b>en retard</span><span><b style="color:var(--info)">${c.proche}</b>échéances ≤ 60 j</span><span><b style="color:var(--warn)">${c.obs}</b>observations à lever</span></span>
+      <span class="foot">Dernière commission : ${fr(x.derniere_commission)} · avis ${avisLabel(x.avis)}</span></a>`; }).join('')}</div>`).join('')}
+    <section style="display:flex;flex-direction:column;gap:10px"><div class="sectitle"><h3>Prochaines échéances</h3></div>
+    ${rows.length ? `<div class="paper tablewrap"><table><thead><tr><th>Échéance</th><th>Site</th><th>Réf.</th><th>Rubrique</th><th>État</th></tr></thead><tbody>${rows.map((r) => { const st = statut(r); return `<tr><td class="num">${fr(r.prochain)}</td><td>${esc(siteOf(r.site_id)?.court)}</td><td class="code">${esc(r.lettre)}</td><td>${esc(r.nom)}</td><td><span class="pill p-${st.k}">${st.l}</span></td></tr>`; }).join('')}</tbody></table></div>`
+      : '<div class="paper empty small">Aucune échéance pour l\'instant. Elles apparaîtront ici dès que des dates de contrôle seront saisies.</div>'}</section>
+    <p class="small muted" style="margin:0">${allObs} observation${allObs > 1 ? 's' : ''} à lever sur l'ensemble des sites.</p>`;
+}
+
+// ---------------------------------------------------------------------
+// Page d'un site
+// ---------------------------------------------------------------------
+function renderSite(id, mode) {
+  const x = siteOf(id);
+  if (!x) { main.innerHTML = '<div class="empty">Site introuvable.</div>'; return; }
+  main.innerHTML = `
+    <div class="print-only"><span class="eyebrow">Registre de sécurité · Vérifications périodiques · Secteur Est</span></div>
+    <section class="paper cover" style="--sc:${siteColor(id)}">
+      <div class="cover-top"><div><span class="eyebrow">Registre de sécurité</span><h2>${esc(x.nom)}</h2></div>
+        <nav class="seg no-print" aria-label="Affichage">
+          <a href="#/site/${id}" ${mode === 'registre' ? 'aria-current="page"' : ''}>Registre</a>
+          <a href="#/site/${id}/historique" ${mode === 'historique' ? 'aria-current="page"' : ''}><span class="long">Par année</span><span class="short">Années</span></a>
+          <a href="#/site/${id}/pieces" ${mode === 'pieces' ? 'aria-current="page"' : ''}><span class="long">Pièces jointes</span><span class="short">Pièces</span></a>
+          <a href="#/site/${id}/commission" ${mode === 'commission' ? 'aria-current="page"' : ''}><span class="long">Vue commission</span><span class="short">Commission</span></a></nav></div>
+      <details class="fichebox" id="fichebox"><summary class="no-print"><span>Fiche de l'établissement</span><span class="small muted" id="fiche-sum"></span></summary><div class="fiche" id="fiche"></div></details>
+      ${mode === 'registre' ? '<div class="strip" id="strip"></div>' : ''}
+    </section>
+    <div id="body" style="display:flex;flex-direction:column;gap:20px"></div>`;
+  const fb = $('#fichebox'); fb.open = mode === 'commission' || window.matchMedia('(min-width: 701px)').matches;
+  $('#fiche-sum').textContent = [x.type_erp ? 'Type ' + x.type_erp : '', x.categorie, x.effectif ? x.effectif + ' pers.' : ''].filter(Boolean).join(' · ');
+  renderFiche(x, mode);
+  if (mode !== 'commission') $('#body').insertAdjacentHTML('beforebegin', `<div class="no-print" id="site-alerts">${alertesHTML(alertes().filter((a) => a.site === id && !a.cat), 'Alertes de ce registre', true)}</div>`);
+  if (mode === 'historique') return renderHistorique(x);
+  if (mode === 'pieces') return renderPieces(x);
+  if (mode === 'commission') return renderCommission(x);
+  renderStrip(id);
+  $('#body').innerHTML = `
+    <section style="display:flex;flex-direction:column;gap:10px">
+      <div class="actions"><div class="sectitle"><h2 style="letter-spacing:.06em;text-transform:uppercase">Sommaire</h2></div><button type="button" class="link" id="showall" ${S.filter === 'all' ? 'hidden' : ''}>Afficher toutes les rubriques</button></div>
+      <div class="paper toc"><div class="toc-cols" aria-hidden="true"><span>Réf.</span><span>Rubrique</span><span>Dernier</span><span>Prochain</span><span>État</span></div><div id="list"></div></div>
+      <div class="addrow no-print"><input id="new-rub" placeholder="Ajouter une rubrique à ce registre" aria-label="Nom de la nouvelle rubrique"><button type="button" id="add-rub">Ajouter</button></div>
+    </section>`;
+  $('#showall').onclick = () => { S.filter = 'all'; render(); };
+  $('#add-rub').onclick = (e) => addRubrique(id, e.target);
+  renderList(id);
+}
+function renderFiche(x, mode) {
+  const F = $('#fiche');
+  if (mode !== 'registre') {
+    F.innerHTML = [['Type d\'ERP', x.type_erp], ['Catégorie', x.categorie], ['Effectif maximal', x.effectif ? x.effectif + ' pers.' : ''],
+      ['Dernière commission', x.derniere_commission ? fr(x.derniere_commission) + ' · ' + avisLabel(x.avis) : ''], ['Prochaine commission', x.prochaine_commission ? fr(x.prochaine_commission) : ''], ['Édité le', fr(today())]]
+      .map(([l, v]) => `<div><div class="eyebrow">${l}</div><div class="val num">${esc(v || '—')}</div></div>`).join('');
+    return;
+  }
+  F.innerHTML = `
+    <label for="i-type">Type d'ERP<input id="i-type" data-i="type_erp" value="${esc(x.type_erp)}" placeholder="X, PA…"></label>
+    <label for="i-cat">Catégorie<input id="i-cat" data-i="categorie" value="${esc(x.categorie)}" placeholder="1re catégorie"></label>
+    <label for="i-eff">Effectif maximal<input id="i-eff" data-i="effectif" value="${esc(x.effectif)}" inputmode="numeric" placeholder="Nombre de personnes"></label>
+    <label for="i-der">Dernière commission<input type="date" id="i-der" data-i="derniere_commission" value="${esc(x.derniere_commission || '')}"></label>
+    <label for="i-avis">Avis rendu<select id="i-avis" data-i="avis"><option value="">Non renseigné</option><option value="favorable" ${x.avis === 'favorable' ? 'selected' : ''}>Favorable</option><option value="defavorable" ${x.avis === 'defavorable' ? 'selected' : ''}>Défavorable</option></select></label>
+    <label for="i-pro">Prochaine commission<input type="date" id="i-pro" data-i="prochaine_commission" value="${esc(x.prochaine_commission || '')}"></label>`;
+  $$('[data-i]', F).forEach((el) => el.addEventListener('change', async () => {
+    const v = el.value.trim(); const k = el.dataset.i;
+    const patch = { [k]: /commission$/.test(k) ? (v || null) : v };
+    const { error } = await S.sb.from('reg_sites').update(patch).eq('id', x.id);
+    if (error) return toast(errMsg(error), true);
+    Object.assign(x, patch); toast('Fiche enregistrée'); renderTabs(route());
+  }));
+}
+function renderStrip(id) {
+  const c = counts(id);
+  const tiles = [['ok', 'Rubriques à jour', c.ok + ' / ' + c.total], ['proche', 'Échéances ≤ 60 jours', c.proche], ['retard', 'Contrôles en retard', c.retard], ['obs', 'Observations à lever', c.obs]];
+  $('#strip').innerHTML = tiles.map(([k, l, n]) => `<button type="button" class="tile ${k}" data-f="${k}" aria-pressed="${S.filter === k}"><span class="n num">${n}</span><span class="l">${l}</span></button>`).join('');
+  $$('[data-f]', $('#strip')).forEach((b) => { b.onclick = () => { S.filter = S.filter === b.dataset.f ? 'all' : b.dataset.f; render(); }; });
+}
+function pieceHTML(p) {
+  const canDel = S.admin || p.ajoute_par === S.me.id;
+  const url = S.urls[p.chemin];
+  return `<li class="pj"><span class="ftype">${TYPES[p.type] || 'FICHIER'}</span>
+    <span style="min-width:0">${url ? `<a href="${esc(url)}" target="_blank" rel="noopener">${esc(p.titre || p.nom_fichier)}</a>` : `<b>${esc(p.titre || p.nom_fichier)}</b>`}
+    <span class="m num">${p.titre ? esc(p.nom_fichier) + ' · ' : ''}${fmtSize(p.taille)} · ajouté le ${fr(p.ajoute_le)}${nameOf(p.ajoute_par) ? ' par ' + esc(nameOf(p.ajoute_par)) : ''}</span></span>
+    <span style="display:flex;flex-direction:column;align-items:flex-end;gap:2px"><button type="button" class="dl" data-dl="${esc(p.chemin)}" data-name="${esc(p.nom_fichier)}">Télécharger</button>
+    ${canDel ? `<button type="button" class="link danger small" data-delpj="${p.id}">${S.confirm === 'pj' + p.id ? 'Confirmer' : 'Retirer'}</button>` : ''}</span></li>`;
+}
+function visitHTML(v) {
+  const url = S.urls[v.signature];
+  return `<li class="visit"><span style="min-width:0"><b>${esc(v.entreprise)}</b> · ${esc(v.intervenant)}
+    <span class="m num">Passage du ${fr(v.date_visite)}${v.resultat ? ' · ' + resLabel[v.resultat] : ''}${nameOf(v.vise_par) ? ' · visé par ' + esc(nameOf(v.vise_par)) : ''}</span>
+    ${v.objet ? `<span class="m">${esc(v.objet)}</span>` : ''}${v.remarques ? `<span class="m">Remarques : ${esc(v.remarques)}</span>` : ''}
+    ${S.admin ? `<button type="button" class="link danger small" data-delvis="${v.id}">${S.confirm === 'vis' + v.id ? 'Confirmer la suppression' : 'Supprimer'}</button>` : ''}</span>
+    ${url ? `<img class="sigimg" src="${esc(url)}" alt="Signature de ${esc(v.intervenant)}">` : '<span class="small muted">Signature</span>'}</li>`;
+}
+function visitFormHTML(r) {
+  return `<div class="visitform" id="vf">
+    <div class="sectitle"><h3>Passage d'une entreprise extérieure</h3></div>
+    <div class="grid2">
+      <label for="v-date">Date du passage<input type="date" id="v-date" value="${today()}"></label>
+      <label for="v-ent">Entreprise<input id="v-ent" value="${esc(r.intervenant)}" placeholder="Socotec, Apave, Sicli…" autocomplete="organization"></label>
+      <label for="v-int">Nom et prénom de l'intervenant<input id="v-int" placeholder="Jean Martin" autocomplete="off"></label>
+      <label for="v-res">Résultat<select id="v-res">${RES_OPTS('')}</select></label>
+      <label for="v-obj" style="grid-column:1/-1">Objet de l'intervention<input id="v-obj" value="${esc(r.nom)}"></label>
+      <label for="v-rem" style="grid-column:1/-1">Remarques de l'intervenant (une par ligne)<textarea id="v-rem" placeholder="Bloc autonome hors service, couloir vestiaires 3"></textarea></label>
+    </div>
+    <p class="attest" id="v-att" style="margin:0"></p>
+    <div class="padwrap"><canvas class="pad" id="v-pad" aria-label="Zone de signature de l'intervenant"></canvas><span class="padline"></span><span class="padhint" id="v-hint">Signature de l'intervenant, au doigt ou à la souris</span></div>
+    <div class="actions"><button type="button" class="link" id="v-clear">Effacer la signature</button></div>
+    <label class="chk"><input type="checkbox" id="v-upd" checked>Mettre à jour la rubrique : dernier contrôle à cette date, prochain dans 12 mois</label>
+    <label class="chk"><input type="checkbox" id="v-obs" checked>Ajouter les remarques aux observations à lever</label>
+    <div class="actions"><button type="button" id="v-cancel">Annuler</button><button type="button" class="primary" id="v-save">Valider le passage signé</button></div>
+  </div>`;
+}
+function initPad(cv, onInk) {
+  const ratio = window.devicePixelRatio || 1;
+  const rect = cv.getBoundingClientRect();
+  cv.width = Math.round(rect.width * ratio); cv.height = Math.round(rect.height * ratio);
+  const ctx = cv.getContext('2d');
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#0E1B33'; ctx.lineWidth = 2.4 * ratio;
+  let drawing = false, last = null, ink = 0;
+  const pt = (e) => { const b = cv.getBoundingClientRect(); return [(e.clientX - b.left) * ratio, (e.clientY - b.top) * ratio]; };
+  cv.addEventListener('pointerdown', (e) => { e.preventDefault(); drawing = true; last = pt(e); cv.setPointerCapture(e.pointerId);
+    ctx.beginPath(); ctx.arc(last[0], last[1], ctx.lineWidth / 2, 0, Math.PI * 2); ctx.fillStyle = ctx.strokeStyle; ctx.fill(); });
+  cv.addEventListener('pointermove', (e) => { if (!drawing) return; e.preventDefault(); const p = pt(e);
+    ctx.beginPath(); ctx.moveTo(last[0], last[1]); ctx.lineTo(p[0], p[1]); ctx.stroke();
+    ink += Math.hypot(p[0] - last[0], p[1] - last[1]) / ratio; last = p; onInk(ink); });
+  const end = () => { drawing = false; };
+  cv.addEventListener('pointerup', end); cv.addEventListener('pointercancel', end);
+  return { clear() { ctx.clearRect(0, 0, cv.width, cv.height); ink = 0; onInk(0); }, ink: () => ink,
+    blob() { // signature sur fond blanc, recadrée
+      const out = document.createElement('canvas'); out.width = cv.width; out.height = cv.height;
+      const o = out.getContext('2d'); o.fillStyle = '#fff'; o.fillRect(0, 0, out.width, out.height); o.drawImage(cv, 0, 0);
+      return new Promise((res) => out.toBlob(res, 'image/png')); } };
+}
+function panelHTML(r) {
+  const obs = S.obs.filter((o) => o.rubrique_id === r.id).sort((a, b) => (a.levee - b.levee) || a.cree_le.localeCompare(b.cree_le));
+  const pcs = piecesOf(r.id);
+  return `<div class="panel">
+    <form class="grid2" id="rf" novalidate>
+      <label for="f-dernier">Dernier contrôle ou mise à jour<input type="date" id="f-dernier" name="dernier" value="${esc(r.dernier || '')}"></label>
+      <label for="f-int">Organisme, technicien ou service<input id="f-int" name="intervenant" value="${esc(r.intervenant)}" placeholder="Nom de l'intervenant"></label>
+      <label for="f-res">Résultat<select id="f-res" name="resultat">${RES_OPTS(r.resultat)}</select></label>
+      <label for="f-pro">Prochain contrôle<input type="date" id="f-pro" name="prochain" value="${esc(r.prochain || '')}"></label>
+      <label for="f-ref" style="grid-column:1/-1">Référence du rapport ou du document<input id="f-ref" name="reference" value="${esc(r.reference)}" placeholder="N° de rapport, ou emplacement dans le classeur papier"></label>
+    </form>
+    <div class="actions"><span class="small muted">${r.maj_le ? 'Dernière saisie le ' + fr(r.maj_le) + (nameOf(r.maj_par) ? ' par ' + esc(nameOf(r.maj_par)) : '') : 'Aucune saisie pour l\'instant'}</span><button type="button" class="primary" id="r-save">Enregistrer</button></div>
+    <div style="display:flex;flex-direction:column;gap:8px"><h4>Observations à lever</h4>
+      ${obs.length ? `<ul class="obslist">${obs.map((o) => `<li class="ob ${o.levee ? 'done' : ''}">
+        <input type="checkbox" id="o-${o.id}" data-obs="${o.id}" ${o.levee ? 'checked' : ''} aria-label="Marquer comme levée">
+        <label for="o-${o.id}" style="color:var(--fg);font-size:.92rem;font-weight:400"><span class="t">${esc(o.texte)}</span>
+        <span class="small muted">${o.levee ? 'Levée le ' + fr(o.levee_le) + (nameOf(o.levee_par) ? ' par ' + esc(nameOf(o.levee_par)) : '') : 'Relevée le ' + fr(o.cree_le)}</span></label>
+        <button type="button" class="link danger small" data-delobs="${o.id}">${S.confirm === 'obs' + o.id ? 'Confirmer' : 'Supprimer'}</button></li>`).join('')}</ul>`
+      : '<p class="small muted" style="margin:0">Aucune observation pour cette rubrique.</p>'}
+      <div class="addrow"><input id="new-obs" placeholder="Saisir une observation du rapport" aria-label="Nouvelle observation"><button type="button" id="add-obs">Ajouter</button></div></div>
+    <div style="display:flex;flex-direction:column;gap:8px"><h4>Pièces jointes</h4>
+      ${pcs.length ? `<ul class="pjlist">${pcs.map(pieceHTML).join('')}</ul>` : '<p class="small muted" style="margin:0">Aucun document joint à cette rubrique.</p>'}
+      <div class="addrow"><input type="file" id="pjf" accept="${ACCEPT}" aria-label="Fichier à joindre"><button type="button" id="pj-up">Joindre</button></div></div>
+    <div style="display:flex;flex-direction:column;gap:8px"><h4>Passages d'entreprises extérieures</h4>
+      ${visitesOf(r.id).length ? `<ul class="pjlist">${visitesOf(r.id).map(visitHTML).join('')}</ul>` : '<p class="small muted" style="margin:0">Aucun passage signé pour cette rubrique.</p>'}
+      ${S.visitFor === r.id ? visitFormHTML(r) : '<div><button type="button" id="v-open">✍ Faire signer un passage</button></div>'}</div>
+    <div><button type="button" class="link danger" id="r-del">${S.confirm === 'rub' + r.id ? 'Confirmer : retirer la rubrique et ses observations (les pièces jointes restent dans les documents généraux)' : 'Retirer cette rubrique'}</button></div>
+  </div>`;
+}
+function renderList(site) {
+  const L = $('#list');
+  const rs = rubOf(site);
+  if (!rs.length) { L.innerHTML = '<div class="empty">Ce registre ne contient aucune rubrique. Ajoutez la première avec le champ ci-dessous.</div>'; return; }
+  const rows = rs.filter((r) => S.filter === 'all' || statut(r).k === S.filter);
+  if (!rows.length) { L.innerHTML = '<div class="empty">Aucune rubrique dans cette catégorie.</div>'; return; }
+  L.innerHTML = rows.map((r) => { const st = statut(r); const n = piecesOf(r.id).length; const open = S.open === r.id;
+    return `<div class="row s-${st.k}" id="row-${r.id}"><button type="button" class="rowhead" data-open="${r.id}" aria-expanded="${open}">
+      <span class="letter">${esc(r.lettre || '·')}</span>
+      <span style="min-width:0"><span class="rname">${esc(r.nom)}</span>${n ? `<span class="clip num">· ${n} PJ</span>` : ''}${r.detail ? `<span class="rdetail">${esc(r.detail)}</span>` : ''}
+        <span class="rmeta num">${r.dernier ? 'Le ' + fr(r.dernier) + (r.prochain ? ' · prochain ' + fr(r.prochain) + ' ' : ' ') : ''}<span class="pill p-${st.k}">${st.l}</span></span></span>
+      <span class="cell num">${fr(r.dernier)}</span><span class="cell num">${fr(r.prochain)}</span><span class="cell"><span class="pill p-${st.k}">${st.l}</span></span>
+    </button>${open ? panelHTML(r) : ''}</div>`; }).join('');
+  $$('[data-open]', L).forEach((b) => { b.onclick = () => { S.open = S.open === b.dataset.open ? null : b.dataset.open; S.confirm = null; S.visitFor = null; renderList(site); if (S.open) $('#row-' + S.open)?.scrollIntoView({ block: 'nearest' }); }; });
+  if (!S.open) return;
+  const r = S.rub.find((x) => x.id === S.open); if (!r) return;
+  const P = $('#row-' + r.id);
+  const fD = $('#f-dernier', P), fP = $('#f-pro', P);
+  fD.addEventListener('change', () => { if (fD.value) fP.value = plus12(fD.value); });
+  $('#r-save', P).onclick = async (e) => {
+    const f = $('#rf', P); const v = (n) => f.elements[n].value.trim();
+    const patch = { dernier: v('dernier') || null, intervenant: v('intervenant'), resultat: v('resultat'), prochain: v('prochain') || null, reference: v('reference') };
+    busy(e.target, true);
+    const { data, error } = await S.sb.from('reg_rubriques').update(patch).eq('id', r.id).select().single();
+    if (error) { busy(e.target, false); return toast(errMsg(error), true); }
+    if (patch.dernier && S.v2) {
+      const prev = S.ctl.find((c) => c.rubrique_id === r.id && c.date_controle === patch.dernier && !c.visite_id);
+      const row = { intervenant: patch.intervenant, resultat: patch.resultat, reference: patch.reference };
+      const h = prev ? await S.sb.from('reg_controles').update(row).eq('id', prev.id)
+        : await S.sb.from('reg_controles').insert({ site_id: site, rubrique_id: r.id, date_controle: patch.dernier, ...row });
+      if (h.error) toast(errMsg(h.error), true);
+    }
+    busy(e.target, false);
+    Object.assign(r, data);
+    if (patch.resultat === 'non_conforme') toast('Contrôle NON CONFORME enregistré : une alerte est affichée.', true); else toast('Rubrique enregistrée');
+    reload();
+  };
+  $('#add-obs', P).onclick = async (e) => {
+    const inp = $('#new-obs', P); const t = inp.value.trim();
+    if (!t) { inp.focus(); return toast('Saisissez le texte de l\'observation.', true); }
+    busy(e.target, true);
+    const { data, error } = await S.sb.from('reg_observations').insert({ rubrique_id: r.id, texte: t }).select().single();
+    busy(e.target, false);
+    if (error) return toast(errMsg(error), true);
+    S.obs.push(data); toast('Observation ajoutée'); renderStrip(site); renderList(site);
+  };
+  $$('[data-obs]', P).forEach((c) => { c.onchange = async () => {
+    const { data, error } = await S.sb.from('reg_observations').update({ levee: c.checked }).eq('id', c.dataset.obs).select().single();
+    if (error) { c.checked = !c.checked; return toast(errMsg(error), true); }
+    Object.assign(S.obs.find((o) => o.id === data.id), data); toast(data.levee ? 'Observation levée' : 'Observation rouverte'); renderStrip(site); renderList(site);
+  }; });
+  $$('[data-delobs]', P).forEach((b) => { b.onclick = async () => {
+    const id = b.dataset.delobs;
+    if (S.confirm !== 'obs' + id) { S.confirm = 'obs' + id; return renderList(site); }
+    S.confirm = null;
+    const { error } = await S.sb.from('reg_observations').delete().eq('id', id);
+    if (error) return toast(errMsg(error), true);
+    S.obs = S.obs.filter((o) => o.id !== id); toast('Observation supprimée'); renderStrip(site); renderList(site);
+  }; });
+  $('#pj-up', P).onclick = async (e) => { const inp = $('#pjf', P); if (await uploadPiece(inp.files[0], site, r.id, '', e.target)) renderList(site); };
+  $$('[data-delpj]', P).forEach((b) => { b.onclick = () => removePiece(b.dataset.delpj, () => renderList(site)); });
+  $('#r-del', P).onclick = async () => {
+    if (S.confirm !== 'rub' + r.id) { S.confirm = 'rub' + r.id; return renderList(site); }
+    S.confirm = null;
+    const { error } = await S.sb.from('reg_rubriques').delete().eq('id', r.id);
+    if (error) return toast(errMsg(error), true);
+    S.open = null; toast('Rubrique retirée'); reload();
+  };
+  $$('[data-delvis]', P).forEach((b) => { b.onclick = async () => {
+    const id = b.dataset.delvis; const v = S.visites.find((x) => x.id === id);
+    if (S.confirm !== 'vis' + id) { S.confirm = 'vis' + id; return renderList(site); }
+    S.confirm = null;
+    const { error } = await S.sb.from('reg_visites').delete().eq('id', id);
+    if (error) return toast(errMsg(error), true);
+    await S.sb.storage.from('registres').remove([v.signature]);
+    S.visites = S.visites.filter((x) => x.id !== id); toast('Passage supprimé'); renderList(site);
+  }; });
+  const vo = $('#v-open', P);
+  if (vo) vo.onclick = () => { S.visitFor = r.id; S.confirm = null; renderList(site); $('#vf')?.scrollIntoView({ block: 'start', behavior: 'smooth' }); };
+  if (S.visitFor === r.id && $('#vf', P)) wireVisit(r, site, P);
+}
+function wireVisit(r, site, P) {
+  const hint = $('#v-hint', P);
+  const pad = initPad($('#v-pad', P), (ink) => { hint.hidden = ink > 0; });
+  const att = () => { const n = $('#v-int', P).value.trim() || '…', e = $('#v-ent', P).value.trim() || '…', d = $('#v-date', P).value;
+    $('#v-att', P).textContent = `Je soussigné(e) ${n}, intervenant(e) pour l'entreprise ${e}, atteste avoir réalisé l'intervention décrite ci-dessus au ${siteOf(site).nom} le ${fr(d)}.`; };
+  ['#v-int', '#v-ent', '#v-date'].forEach((k) => $(k, P).addEventListener('input', att)); att();
+  const syncObs = () => { $('#v-obs', P).closest('label').hidden = !$('#v-rem', P).value.trim(); };
+  $('#v-rem', P).addEventListener('input', syncObs); syncObs();
+  $('#v-clear', P).onclick = () => pad.clear();
+  $('#v-cancel', P).onclick = () => { S.visitFor = null; renderList(site); };
+  $('#v-save', P).onclick = async (e) => {
+    const date = $('#v-date', P).value, ent = $('#v-ent', P).value.trim(), int = $('#v-int', P).value.trim();
+    const res = $('#v-res', P).value, obj = $('#v-obj', P).value.trim(), rem = $('#v-rem', P).value.trim();
+    if (!date) return toast('Indiquez la date du passage.', true);
+    if (!ent) { $('#v-ent', P).focus(); return toast('Indiquez le nom de l\'entreprise.', true); }
+    if (!int) { $('#v-int', P).focus(); return toast('Indiquez le nom de l\'intervenant.', true); }
+    if (pad.ink() < 25) return toast('La signature de l\'intervenant est manquante.', true);
+    busy(e.target, true);
+    const chemin = site + '/signatures/' + (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2)) + '.png';
+    try {
+      const blob = await pad.blob();
+      const up = await S.sb.storage.from('registres').upload(chemin, blob, { contentType: 'image/png', upsert: false });
+      if (up.error) throw up.error;
+      const ins = await S.sb.from('reg_visites').insert({ site_id: site, rubrique_id: r.id, date_visite: date, entreprise: ent, intervenant: int, objet: obj, resultat: res, remarques: rem, signature: chemin, vise_par: S.me.id }).select().single();
+      if (ins.error) { await S.sb.storage.from('registres').remove([chemin]); throw ins.error; }
+      if ($('#v-upd', P).checked) {
+        const u = await S.sb.from('reg_rubriques').update({ dernier: date, intervenant: ent, resultat: res || r.resultat, prochain: plus12(date) }).eq('id', r.id);
+        if (u.error) toast(errMsg(u.error), true);
+      }
+      if (S.v2) await S.sb.from('reg_controles').insert({ site_id: site, rubrique_id: r.id, date_controle: date, intervenant: ent + ' (' + int + ')', resultat: res, remarques: rem, visite_id: ins.data.id });
+      const lines = rem.split('\n').map((l) => l.trim()).filter(Boolean);
+      if (lines.length && $('#v-obs', P).checked) {
+        const o = await S.sb.from('reg_observations').insert(lines.map((t) => ({ rubrique_id: r.id, texte: t })));
+        if (o.error) toast(errMsg(o.error), true);
+      }
+      S.visitFor = null; toast('Passage signé enregistré');
+      await reload();
+    } catch (err) { toast(errMsg(err), true); } finally { busy(e.target, false); }
+  };
+}
+async function addRubrique(site, btn) {
+  const inp = $('#new-rub'); const nom = inp.value.trim();
+  if (!nom) { inp.focus(); return toast('Saisissez le nom de la rubrique.', true); }
+  const ordre = Math.max(0, ...rubOf(site).map((r) => r.ordre)) + 1;
+  busy(btn, true);
+  const { data, error } = await S.sb.from('reg_rubriques').insert({ site_id: site, nom, ordre }).select().single();
+  busy(btn, false);
+  if (error) return toast(errMsg(error), true);
+  S.rub.push(data); S.open = data.id; S.filter = 'all'; toast('Rubrique ajoutée'); render();
+}
+
+// ---------------------------------------------------------------------
+// Pièces jointes
+// ---------------------------------------------------------------------
+function fileType(f) { const e = (f.name.split('.').pop() || '').toLowerCase(); return { pdf: 'application/pdf', jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp' }[e] || f.type; }
+async function shrinkPhoto(file, type) {
+  // Photos de plus de 1,5 Mo : réduites à 2000 px pour économiser l'espace
+  if (!/^image\/(jpeg|png|webp)$/.test(type) || file.size < 1.5 * 1048576 || !window.createImageBitmap) return { blob: file, type };
+  try {
+    const bmp = await createImageBitmap(file);
+    const k = Math.min(1, 2000 / Math.max(bmp.width, bmp.height));
+    const c = document.createElement('canvas'); c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k);
+    c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+    const blob = await new Promise((res) => c.toBlob(res, 'image/jpeg', 0.82));
+    return blob && blob.size < file.size ? { blob, type: 'image/jpeg' } : { blob: file, type };
+  } catch (e) { return { blob: file, type }; }
+}
+async function uploadPiece(file, site, rubriqueId, titre, btn) {
+  if (!file) { toast('Choisissez d\'abord un fichier.', true); return false; }
+  let type = fileType(file);
+  if (!TYPES[type]) { toast('Formats acceptés : PDF, JPG, PNG ou WEBP.', true); return false; }
+  if (S.busy) return false;
+  S.busy = true; busy(btn, true); toast('Envoi en cours…');
+  try {
+    const sh = await shrinkPhoto(file, type); type = sh.type;
+    if (sh.blob.size > 20 * 1048576) { toast('Fichier trop lourd : 20 Mo maximum.', true); return false; }
+    let nom = file.name; if (type === 'image/jpeg' && !/\.jpe?g$/i.test(nom)) nom = nom.replace(/\.[^.]+$/, '') + '.jpg';
+    const safe = nom.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^A-Za-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '').slice(-80) || 'document';
+    const chemin = site + '/' + (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2)) + '-' + safe;
+    const up = await S.sb.storage.from('registres').upload(chemin, sh.blob, { contentType: type, upsert: false });
+    if (up.error) throw up.error;
+    const { data, error } = await S.sb.from('reg_pieces').insert({ site_id: site, rubrique_id: rubriqueId === 'general' ? null : rubriqueId, titre: (titre || '').trim(), nom_fichier: nom, chemin, type, taille: sh.blob.size, ajoute_par: S.me.id }).select().single();
+    if (error) { await S.sb.storage.from('registres').remove([chemin]); throw error; }
+    const s = await S.sb.storage.from('registres').createSignedUrl(chemin, 3600);
+    if (s.data) S.urls[chemin] = s.data.signedUrl;
+    S.pieces.push(data); toast('Pièce jointe ajoutée'); return true;
+  } catch (e) { toast(errMsg(e), true); return false; } finally { S.busy = false; busy(btn, false); }
+}
+async function removePiece(id, rerender) {
+  const p = S.pieces.find((x) => x.id === id); if (!p) return;
+  if (S.confirm !== 'pj' + id) { S.confirm = 'pj' + id; return rerender(); }
+  S.confirm = null;
+  const rm = await S.sb.storage.from('registres').remove([p.chemin]);
+  if (rm.error) { toast(errMsg(rm.error), true); return rerender(); }
+  const { error } = await S.sb.from('reg_pieces').delete().eq('id', id);
+  if (error) { toast(errMsg(error), true); return rerender(); }
+  S.pieces = S.pieces.filter((x) => x.id !== id); toast('Pièce jointe retirée'); rerender();
+}
+function renderPieces(x) {
+  const rs = rubOf(x.id);
+  const opts = rs.map((r) => `<option value="${r.id}">${esc((r.lettre ? r.lettre + ' · ' : '') + r.nom)}</option>`).join('') + '<option value="general">Documents généraux du site</option>';
+  const years = [...new Set(S.pieces.filter((p) => p.site_id === x.id).map((p) => p.ajoute_le.slice(0, 4)))].sort().reverse();
+  const all = S.pieces.filter((p) => p.site_id === x.id && (S.pjAnnee === 'all' || p.ajoute_le.startsWith(S.pjAnnee)));
+  const groups = [...rs.map((r) => ({ id: r.id, code: r.lettre || '·', nom: r.nom })), { id: 'general', code: '—', nom: 'Documents généraux du site' }]
+    .filter((g) => S.pjFilter === 'all' || S.pjFilter === g.id)
+    .map((g) => ({ ...g, items: g.id === 'general' ? all.filter((p) => !p.rubrique_id) : piecesOf(g.id) })).filter((g) => g.items.length);
+  $('#body').innerHTML = `
+    <section class="paper box"><div class="sectitle"><h3>Joindre un document</h3><span class="small muted">PDF, JPG, PNG ou WEBP · 20 Mo maximum · les photos lourdes sont allégées</span></div>
+      <div class="grid2">
+        <label for="pj-sect">Rubrique<select id="pj-sect">${opts}</select></label>
+        <label for="pj-titre">Intitulé (facultatif)<input id="pj-titre" placeholder="Rapport de vérification 2026"></label>
+        <label for="pj-file">Fichier<input type="file" id="pj-file" accept="${ACCEPT}"></label></div>
+      <div class="actions"><span class="small muted">Visible par toutes les personnes autorisées sur ce registre.</span><button type="button" class="primary" id="pj-send">Joindre le fichier</button></div></section>
+    <section style="display:flex;flex-direction:column;gap:10px">
+      <div class="actions"><div class="sectitle"><h3>Pièces jointes</h3><span class="small muted num">${all.length}</span></div>
+        <span style="display:flex;gap:8px;flex-wrap:wrap"><label for="pj-annee" style="flex-direction:row;align-items:center;gap:8px">Année<select id="pj-annee" class="yearsel"><option value="all">Toutes</option>${years.map((y) => `<option value="${y}" ${S.pjAnnee === y ? 'selected' : ''}>${y}</option>`).join('')}</select></label>
+        <label for="pj-filter" style="flex-direction:row;align-items:center;gap:8px">Rubrique<select id="pj-filter" style="width:auto;max-width:240px"><option value="all">Toutes</option>${opts}</select></label></span></div>
+      ${groups.length ? groups.map((g) => `<div class="pjgroup"><span class="code">${esc(g.code)}</span><span>${esc(g.nom)}</span></div><ul class="pjlist">${g.items.map(pieceHTML).join('')}</ul>`).join('')
+        : `<div class="paper empty">${all.length ? 'Aucune pièce jointe pour cette rubrique.' : 'Aucune pièce jointe pour l\'instant. Rapports de vérification, PV de commission, plans ou attestations : joignez-les ici, rubrique par rubrique.'}</div>`}
+    </section>`;
+  $('#pj-filter').value = S.pjFilter;
+  if (S.pjFilter !== 'all') $('#pj-sect').value = S.pjFilter;
+  $('#pj-filter').onchange = (e) => { S.pjFilter = e.target.value; renderPieces(x); };
+  $('#pj-annee').onchange = (e) => { S.pjAnnee = e.target.value; renderPieces(x); };
+  $('#pj-send').onclick = async (e) => { if (await uploadPiece($('#pj-file').files[0], x.id, $('#pj-sect').value, $('#pj-titre').value, e.target)) renderPieces(x); };
+  $$('[data-delpj]', $('#body')).forEach((b) => { b.onclick = () => removePiece(b.dataset.delpj, () => renderPieces(x)); });
+}
+
+// ---------------------------------------------------------------------
+// Vue commission (imprimable)
+// ---------------------------------------------------------------------
+function renderCommission(x) {
+  const rs = rubOf(x.id); const ids = new Set(rs.map((r) => r.id));
+  const open = S.obs.filter((o) => ids.has(o.rubrique_id) && !o.levee);
+  const levees = S.obs.filter((o) => ids.has(o.rubrique_id) && o.levee).length;
+  const vis = S.visites.filter((v) => v.site_id === x.id);
+  const rubName = (rid) => { const r = S.rub.find((y) => y.id === rid); return r ? (r.lettre ? r.lettre + ' · ' : '') + r.nom : ''; };
+  $('#body').innerHTML = `
+    <div class="actions no-print"><span class="small muted">Pour la visite : imprimez cette page ou enregistrez-la en PDF.</span><button type="button" class="primary" id="print">Imprimer ou enregistrer en PDF</button></div>
+    <section style="display:flex;flex-direction:column;gap:10px"><div class="sectitle"><h3>Vérifications par rubrique</h3></div>
+    <div class="paper tablewrap"><table><thead><tr><th>Réf.</th><th>Rubrique</th><th>Dernier</th><th>Intervenant</th><th>Résultat</th><th>Obs. à lever</th><th>Prochain</th><th>PJ</th></tr></thead><tbody>
+    ${rs.map((r) => `<tr><td class="code">${esc(r.lettre)}</td><td><b>${esc(r.nom)}</b>${r.reference ? `<br><span class="small muted">Réf. ${esc(r.reference)}</span>` : ''}</td><td class="num">${fr(r.dernier)}</td><td>${esc(r.intervenant) || '—'}</td><td>${resLabel[r.resultat || '']}</td><td class="num">${openObs(r.id).length || 'Aucune'}</td><td class="num">${fr(r.prochain)}</td><td class="num">${piecesOf(r.id).length || '—'}</td></tr>`).join('') || '<tr><td colspan="8" class="muted">Aucune rubrique.</td></tr>'}
+    </tbody></table></div></section>
+    <section style="display:flex;flex-direction:column;gap:10px"><div class="sectitle"><h3>Observations en cours</h3><span class="small muted num">${open.length}</span></div>
+    ${open.length ? `<div class="paper tablewrap"><table><thead><tr><th>Rubrique</th><th>Observation</th><th>Relevée le</th></tr></thead><tbody>${open.map((o) => `<tr><td>${esc(rubName(o.rubrique_id))}</td><td>${esc(o.texte)}</td><td class="num">${fr(o.cree_le)}</td></tr>`).join('')}</tbody></table></div>` : '<div class="paper empty small">Aucune observation en attente.</div>'}
+    <p class="small muted" style="margin:0">${levees} observation${levees > 1 ? 's' : ''} levée${levees > 1 ? 's' : ''} au total.</p></section>
+    <section style="display:flex;flex-direction:column;gap:10px"><div class="sectitle"><h3>Passages d'entreprises extérieures</h3><span class="small muted num">${vis.length}</span></div>
+    ${vis.length ? `<div class="paper tablewrap"><table><thead><tr><th>Date</th><th>Réf.</th><th>Entreprise</th><th>Intervenant</th><th>Objet</th><th>Résultat</th><th>Signature</th><th>Visé par</th></tr></thead><tbody>${vis.map((v) => { const rr = S.rub.find((y) => y.id === v.rubrique_id); const url = S.urls[v.signature];
+      return `<tr><td class="num">${fr(v.date_visite)}</td><td class="code">${esc(rr?.lettre || '')}</td><td>${esc(v.entreprise)}</td><td>${esc(v.intervenant)}</td><td>${esc(v.objet)}</td><td>${resLabel[v.resultat || '']}</td><td>${url ? `<img class="sigimg" src="${esc(url)}" alt="Signature">` : '—'}</td><td>${esc(nameOf(v.vise_par)) || '—'}</td></tr>`; }).join('')}</tbody></table></div>` : '<div class="paper empty small">Aucun passage signé.</div>'}</section>
+    ${S.v2 ? `<section style="display:flex;flex-direction:column;gap:10px"><div class="sectitle"><h3>BAES et extincteurs</h3></div><div class="paper tablewrap"><table><thead><tr><th>Équipement</th><th>En service</th><th>Conformes</th><th>À contrôler</th><th>En défaut</th><th>Dernier contrôle</th></tr></thead><tbody>
+      ${Object.entries(CATS).map(([k, C]) => { const l = S.eq.filter((e) => e.categorie === k && e.site_id === x.id && e.actif); const st = l.map(eqStatut); const last = l.map((e) => eqCtl(e)[0]?.date_controle).filter(Boolean).sort().pop();
+        return `<tr><td><b>${C.titre}</b></td><td class="num">${l.length}</td><td class="num">${st.filter((s) => s.k === 'ok' || s.k === 'proche').length}</td><td class="num">${st.filter((s) => s.k === 'obs').length}</td><td class="num">${st.filter((s) => s.k === 'retard').length}</td><td class="num">${fr(last)}</td></tr>`; }).join('')}</tbody></table></div></section>` : ''}
+    <section class="paper sign"><div><span class="eyebrow">Exploitant ou représentant</span><p class="small muted" style="margin:4px 0 0">Je soussigné(e), nom, prénom, fonction, atteste l'exactitude des informations du présent registre. « Certifié conforme »</p><div class="line"></div></div><div><span class="eyebrow">Date et signature</span><div class="line" style="margin-top:44px"></div></div></section>`;
+  $('#print').onclick = () => window.print();
+}
+
+// ---------------------------------------------------------------------
+// Accès (administrateur)
+// ---------------------------------------------------------------------
+// ---------------------------------------------------------------------
+// Alertes
+// ---------------------------------------------------------------------
+function alertes() {
+  const out = []; const t = today();
+  for (const r of S.rub) {
+    const sc = siteOf(r.site_id)?.court || ''; const lab = (r.lettre ? r.lettre + ' · ' : '') + r.nom;
+    const base = { site: r.site_id, href: '#/site/' + r.site_id, rid: r.id };
+    if (r.resultat === 'non_conforme') out.push({ ...base, niveau: 'rouge', texte: 'Contrôle non conforme : ' + lab, sub: sc + (r.dernier ? ' · contrôle du ' + fr(r.dernier) : '') });
+    else if (r.prochain && r.prochain < t) out.push({ ...base, niveau: 'rouge', texte: 'Contrôle en retard : ' + lab, sub: sc + ' · prévu le ' + fr(r.prochain) });
+    else if (r.prochain && days(r.prochain) <= 30) out.push({ ...base, niveau: 'orange', texte: 'Contrôle à prévoir : ' + lab, sub: sc + ' · avant le ' + fr(r.prochain) });
+  }
+  for (const x of S.sites) {
+    const ids = new Set(rubOf(x.id).map((r) => r.id));
+    const n = S.obs.filter((o) => !o.levee && ids.has(o.rubrique_id)).length;
+    if (n) out.push({ niveau: 'orange', site: x.id, href: '#/site/' + x.id, texte: n + (n > 1 ? ' observations à lever' : ' observation à lever'), sub: x.court });
+  }
+  out.push(...alertesEquipements());
+  if (S.admin && S.v2) {
+    const ls = S.params.derniere_sauvegarde;
+    if (!ls || days(ls.slice(0, 10)) < -30) out.push({ niveau: 'orange', site: '', href: '#/sauvegarde', texte: 'Sauvegarde à faire', sub: ls ? 'Dernière le ' + fr(ls) : 'Aucune sauvegarde pour l\'instant' });
+  }
+  return out.sort((a, b) => (a.niveau === 'rouge' ? 0 : 1) - (b.niveau === 'rouge' ? 0 : 1));
+}
+function alertesHTML(list, title, compact) {
+  if (!list.length) return compact ? '' : '<div class="notice" style="background:var(--ok-bg);color:var(--ok)">Aucune alerte : tout est à jour.</div>';
+  const nR = list.filter((a) => a.niveau === 'rouge').reduce((t, a) => t + (a.n || 1), 0);
+  const shown = list.slice(0, compact ? 6 : 15);
+  return `<section class="alerts" aria-label="${esc(title)}"><div class="sectitle"><h3>${esc(title)}</h3><span class="small muted num">${nR ? nR + ' urgente' + (nR > 1 ? 's' : '') + ' · ' : ''}${list.length} au total</span></div>
+    ${shown.map((a) => `<a class="alert ${a.niveau}" href="${a.href}" ${a.rid ? `data-rid="${a.rid}"` : ''} ${a.eqsite ? `data-eqsite="${a.eqsite}"` : ''}><span class="ic">${a.niveau === 'rouge' ? '!' : '•'}</span><span style="min-width:0"><b>${esc(a.texte)}</b><span class="small" style="display:block;color:var(--muted)">${esc(a.sub)}</span></span><span class="go">Voir ›</span></a>`).join('')}
+    ${list.length > shown.length ? `<p class="small muted" style="margin:0">Et ${list.length - shown.length} autre${list.length - shown.length > 1 ? 's' : ''}.</p>` : ''}</section>`;
+}
+document.addEventListener('click', (e) => {
+  const a = e.target.closest('a[data-rid]'); if (!a) return;
+  S.pendingOpen = a.dataset.rid;
+  if (location.hash === a.getAttribute('href')) { e.preventDefault(); S.open = S.pendingOpen; S.pendingOpen = null; render(); setTimeout(() => $('#row-' + S.open)?.scrollIntoView({ block: 'start' }), 50); }
+});
+window.addEventListener('hashchange', () => {
+  if (S.pendingOpen) { S.open = S.pendingOpen; S.pendingOpen = null; render(); setTimeout(() => $('#row-' + S.open)?.scrollIntoView({ block: 'start' }), 50); }
+});
+
+// ---------------------------------------------------------------------
+// Téléchargements, zip, CSV
+// ---------------------------------------------------------------------
+function saveBlob(blob, name) {
+  const u = URL.createObjectURL(blob); const a = document.createElement('a');
+  a.href = u; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(u), 60000);
+}
+async function downloadPath(path, name) {
+  const { data, error } = await S.sb.storage.from('registres').createSignedUrl(path, 600, { download: name || true });
+  if (error || !data) return toast(errMsg(error || 'Téléchargement impossible.'), true);
+  const a = document.createElement('a'); a.href = data.signedUrl; a.rel = 'noopener'; document.body.appendChild(a); a.click(); a.remove();
+}
+let jszipLoading = null;
+function loadJSZip() {
+  if (window.JSZip) return Promise.resolve();
+  if (!jszipLoading) jszipLoading = new Promise((res, rej) => { const sc = document.createElement('script'); sc.src = 'https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js'; sc.onload = res; sc.onerror = () => { jszipLoading = null; rej(new Error('Impossible de préparer le fichier zip. Vérifiez la connexion Internet.')); }; document.head.appendChild(sc); });
+  return jszipLoading;
+}
+const csvCell = (v) => { v = v == null ? '' : typeof v === 'object' ? JSON.stringify(v) : String(v); return /[;"\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+const csv = (rows) => '﻿' + rows.map((r) => r.map(csvCell).join(';')).join('\r\n');
+const tableCsv = (data) => { if (!data.length) return '﻿'; const cols = [...new Set(data.flatMap((o) => Object.keys(o)))]; return csv([cols, ...data.map((o) => cols.map((c) => o[c]))]); };
+const cleanName = (s) => String(s || '').normalize('NFC').replace(/[\\/:*?"<>|]+/g, '-').replace(/\s+/g, ' ').trim().slice(0, 80) || 'document';
+async function fetchStored(path) { const { data, error } = await S.sb.storage.from('registres').download(path); if (error) throw error; return data; }
+function uniqueName(used, name) { let n = name, i = 2; const dot = name.lastIndexOf('.'); while (used.has(n)) { n = dot > 0 ? name.slice(0, dot) + ' (' + i + ')' + name.slice(dot) : name + ' (' + i + ')'; i++; } used.add(n); return n; }
+
+// ---------------------------------------------------------------------
+// Historique par année
+// ---------------------------------------------------------------------
+function yearsFor(site) {
+  const ys = new Set([String(new Date().getFullYear())]);
+  S.ctl.filter((c) => c.site_id === site).forEach((c) => ys.add(c.date_controle.slice(0, 4)));
+  S.pieces.filter((p) => p.site_id === site).forEach((p) => ys.add(p.ajoute_le.slice(0, 4)));
+  S.visites.filter((v) => v.site_id === site).forEach((v) => ys.add(v.date_visite.slice(0, 4)));
+  return [...ys].sort().reverse();
+}
+function renderHistorique(x) {
+  const B = $('#body');
+  if (!S.v2) { B.innerHTML = '<div class="notice warn">L\'historique par année nécessite la mise à jour de la base de données (script « mise-a-jour-v2 »).</div>'; return; }
+  const years = yearsFor(x.id); if (!years.includes(S.annee)) S.annee = years[0];
+  const ord = (rid) => S.rub.find((r) => r.id === rid)?.ordre ?? 999;
+  const list = S.ctl.filter((c) => c.site_id === x.id && c.date_controle.startsWith(S.annee)).sort((a, b) => ord(a.rubrique_id) - ord(b.rubrique_id) || a.date_controle.localeCompare(b.date_controle));
+  const pcs = S.pieces.filter((p) => p.site_id === x.id && p.ajoute_le.startsWith(S.annee));
+  const vis = S.visites.filter((v) => v.site_id === x.id && v.date_visite.startsWith(S.annee));
+  const neg = list.filter((c) => c.resultat === 'non_conforme').length;
+  const done = new Set(list.map((c) => c.rubrique_id));
+  const missing = rubOf(x.id).filter((r) => !done.has(r.id));
+  const rub = (rid) => S.rub.find((r) => r.id === rid);
+  B.innerHTML = `
+    <section class="paper box">
+      <div class="actions"><div class="sectitle"><h2>Contrôles de l'année</h2></div>
+        <label for="y-sel" style="flex-direction:row;align-items:center;gap:8px">Année<select id="y-sel" class="yearsel">${years.map((y) => `<option ${y === S.annee ? 'selected' : ''}>${y}</option>`).join('')}</select></label></div>
+      <div class="kpis paper" style="border-radius:8px">
+        <div class="tile ok"><span class="n num">${list.length}</span><span class="l">Contrôles enregistrés</span></div>
+        <div class="tile retard"><span class="n num">${neg}</span><span class="l">Non conformes</span></div>
+        <div class="tile proche"><span class="n num">${vis.length}</span><span class="l">Passages signés</span></div>
+        <div class="tile obs"><span class="n num">${pcs.length}</span><span class="l">Pièces jointes</span></div></div>
+      <div class="actions"><span class="small muted">Tout ${S.annee} dans un seul fichier : tableau des contrôles, pièces jointes et signatures.</span>
+        <span style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" id="y-csv">Tableau (.csv)</button><button type="button" class="primary" id="y-zip">Télécharger l'année ${S.annee}</button></span></div>
+    </section>
+    <section style="display:flex;flex-direction:column;gap:10px"><div class="sectitle"><h3>Détail ${S.annee}</h3><span class="small muted num">${list.length}</span></div>
+    ${list.length ? `<div class="paper tablewrap"><table><thead><tr><th>Date</th><th>Réf.</th><th>Rubrique</th><th>Intervenant</th><th>Résultat</th><th>Remarques / réf.</th>${S.admin ? '<th></th>' : ''}</tr></thead><tbody>
+      ${list.map((c) => { const r = rub(c.rubrique_id); return `<tr><td class="num">${fr(c.date_controle)}</td><td class="code">${esc(r?.lettre || '')}</td><td>${esc(r?.nom || 'Rubrique retirée')}${c.visite_id ? '<br><span class="small muted">Passage signé</span>' : ''}</td><td>${esc(c.intervenant) || '—'}</td>
+        <td>${c.resultat === 'non_conforme' ? '<span class="pill p-nc">Non conforme</span>' : resLabel[c.resultat || '']}</td><td class="small">${esc([c.reference ? 'Réf. ' + c.reference : '', c.remarques].filter(Boolean).join(' · ')) || '—'}</td>
+        ${S.admin ? `<td><button type="button" class="link danger small" data-delctl="${c.id}">${S.confirm === 'ctl' + c.id ? 'Confirmer' : 'Supprimer'}</button></td>` : ''}</tr>`; }).join('')}</tbody></table></div>`
+      : `<div class="paper empty">Aucun contrôle enregistré en ${S.annee}.</div>`}</section>
+    ${missing.length && S.annee === String(new Date().getFullYear()) ? `<section style="display:flex;flex-direction:column;gap:8px"><div class="sectitle"><h3>Pas encore contrôlé en ${S.annee}</h3><span class="small muted num">${missing.length}</span></div>
+      <div class="paper box small" style="gap:4px">${missing.map((r) => `<span><b class="num" style="display:inline-block;min-width:32px">${esc(r.lettre)}</b>${esc(r.nom)}</span>`).join('')}</div></section>` : ''}`;
+  $('#y-sel').onchange = (e) => { S.annee = e.target.value; renderHistorique(x); };
+  $('#y-csv').onclick = () => saveBlob(new Blob([csv([['Date', 'Réf.', 'Rubrique', 'Intervenant', 'Résultat', 'Référence', 'Remarques', 'Passage signé'],
+    ...list.map((c) => { const r = rub(c.rubrique_id); return [fr(c.date_controle), r?.lettre || '', r?.nom || '', c.intervenant, resLabel[c.resultat || ''], c.reference, c.remarques, c.visite_id ? 'oui' : '']; })])], { type: 'text/csv' }), cleanName(`Controles ${x.court} ${S.annee}`) + '.csv');
+  $('#y-zip').onclick = (e) => zipAnnee(x, S.annee, list, pcs, vis, e.target);
+  $$('[data-delctl]', B).forEach((b) => { b.onclick = async () => {
+    const id = b.dataset.delctl;
+    if (S.confirm !== 'ctl' + id) { S.confirm = 'ctl' + id; return renderHistorique(x); }
+    S.confirm = null;
+    const { error } = await S.sb.from('reg_controles').delete().eq('id', id);
+    if (error) return toast(errMsg(error), true);
+    S.ctl = S.ctl.filter((c) => c.id !== id); toast('Ligne supprimée de l\'historique'); renderHistorique(x);
+  }; });
+}
+async function zipAnnee(x, annee, list, pcs, vis, btn) {
+  busy(btn, true);
+  try {
+    await loadJSZip();
+    const zip = new JSZip(); const root = cleanName(`Registre ${x.court} ${annee}`);
+    const rub = (rid) => S.rub.find((r) => r.id === rid);
+    zip.file(root + '/Controles ' + annee + '.csv', csv([['Date', 'Réf.', 'Rubrique', 'Intervenant', 'Résultat', 'Référence', 'Remarques'],
+      ...list.map((c) => { const r = rub(c.rubrique_id); return [fr(c.date_controle), r?.lettre || '', r?.nom || '', c.intervenant, resLabel[c.resultat || ''], c.reference, c.remarques]; })]));
+    const ids = new Set(rubOf(x.id).map((r) => r.id));
+    zip.file(root + '/Observations ' + annee + '.csv', csv([['Relevée le', 'Réf.', 'Rubrique', 'Observation', 'Levée le'],
+      ...S.obs.filter((o) => ids.has(o.rubrique_id) && o.cree_le.startsWith(annee)).map((o) => { const r = rub(o.rubrique_id); return [fr(o.cree_le), r?.lettre || '', r?.nom || '', o.texte, o.levee ? fr(o.levee_le) : '']; })]));
+    zip.file(root + '/Passages signes ' + annee + '.csv', csv([['Date', 'Réf.', 'Entreprise', 'Intervenant', 'Objet', 'Résultat', 'Remarques', 'Visé par'],
+      ...vis.map((v) => [fr(v.date_visite), rub(v.rubrique_id)?.lettre || '', v.entreprise, v.intervenant, v.objet, resLabel[v.resultat || ''], v.remarques, nameOf(v.vise_par)])]));
+    const files = [...pcs.map((p) => { const r = rub(p.rubrique_id); return { path: p.chemin, dir: 'Pieces jointes/' + cleanName(r ? (r.lettre ? r.lettre + ' - ' : '') + r.nom : 'Documents generaux'), name: cleanName(p.nom_fichier) }; }),
+      ...vis.map((v) => ({ path: v.signature, dir: 'Signatures', name: cleanName(v.date_visite + ' ' + v.entreprise + ' ' + v.intervenant) + '.png' }))];
+    const used = new Set(); const fails = [];
+    for (let i = 0; i < files.length; i++) {
+      toast(`Préparation : fichier ${i + 1} sur ${files.length}…`);
+      try { zip.file(root + '/' + uniqueName(used, files[i].dir + '/' + files[i].name), await fetchStored(files[i].path)); } catch (e) { fails.push(files[i].dir + '/' + files[i].name); }
+    }
+    if (fails.length) zip.file(root + '/FICHIERS MANQUANTS.txt', 'Ces fichiers n\'ont pas pu être récupérés :\r\n' + fails.join('\r\n'));
+    toast('Création du fichier zip…');
+    saveBlob(await zip.generateAsync({ type: 'blob' }), root + '.zip');
+    toast(fails.length ? `Téléchargé, sauf ${fails.length} fichier(s) introuvable(s).` : 'Année ' + annee + ' téléchargée', !!fails.length);
+  } catch (e) { toast(errMsg(e), true); } finally { busy(btn, false); }
+}
+
+// ---------------------------------------------------------------------
+// Équipements de sécurité : BAES et extincteurs
+// ---------------------------------------------------------------------
+const CATS = {
+  baes: {
+    court: 'BAES', titre: 'Éclairage de sécurité (BAES)', un: 'bloc', plur: 'blocs', prefix: 'BAES', color: '#0E7A3A', freqKey: 'baes_frequence_jours', etiquette: 'Éclairage de sécurité',
+    types: [['evacuation', 'Évacuation (balisage)'], ['ambiance', 'Ambiance (anti-panique)'], ['evacuation_ambiance', 'Évacuation + ambiance'], ['baeh', 'BAEH (habitation)'], ['autre', 'Autre']],
+    controles: {
+      mensuel: { nom: 'Contrôle mensuel', points: [['voyant', 'Voyant de charge (LED verte) allumé'], ['allumage', 'S\'allume en coupure secteur (test)'], ['picto', 'Pictogramme lisible, flèche dans le bon sens'], ['diffuseur', 'Diffuseur propre et intact'], ['fixation', 'Bien fixé, visible, non masqué']] },
+      autonomie: { nom: 'Test d\'autonomie (semestriel)', points: [['autonomie', 'Reste allumé au moins 1 heure en coupure'], ['recharge', 'Voyant de charge revenu au vert après le test']] },
+    },
+  },
+  extincteur: {
+    court: 'Extincteurs', titre: 'Extincteurs', un: 'extincteur', plur: 'extincteurs', prefix: 'EXT', color: '#B3261E', freqKey: 'extincteur_frequence_jours', etiquette: 'Extincteur',
+    types: [['eau', 'Eau pulvérisée + additif'], ['co2', 'CO2'], ['poudre_abc', 'Poudre ABC'], ['poudre_bc', 'Poudre BC'], ['mousse', 'Mousse'], ['autre', 'Autre']],
+    controles: {
+      mensuel: { nom: 'Contrôle visuel', points: [['present', 'Présent à sa place, accessible, non masqué'], ['signal', 'Signalétique en place'], ['goupille', 'Goupille et scellé intacts'], ['manometre', 'Manomètre dans le vert (si équipé)'], ['etat', 'Corps, tuyau et diffuseur en bon état'], ['etiquette', 'Étiquette de vérification annuelle à jour'], ['consigne', 'Mode d\'emploi lisible']] },
+    },
+  },
+};
+const appBase = () => location.href.split('#')[0].split('?')[0];
+function qrSVG(text) {
+  if (!window.qrcode) return '<span class="small muted">QR indisponible</span>';
+  const q = window.qrcode(0, 'M'); q.addData(text); q.make();
+  return q.createSvgTag({ cellSize: 4, margin: 2, scalable: true });
+}
+const typeLabel = (e) => (CATS[e.categorie].types.find((t) => t[0] === e.type_equipement) || [, ''])[1];
+function indexEq() {
+  S.eqCtlBy = new Map();
+  for (const c of S.eqCtlAll) { if (!S.eqCtlBy.has(c.equipement_id)) S.eqCtlBy.set(c.equipement_id, []); S.eqCtlBy.get(c.equipement_id).push(c); }
+  for (const l of S.eqCtlBy.values()) l.sort((a, b) => b.date_controle.localeCompare(a.date_controle) || b.cree_le.localeCompare(a.cree_le));
+}
+const eqCtl = (e) => S.eqCtlBy.get(e.id) || [];
+function eqStatut(e) {
+  if (!e.actif) return { k: 'vide', l: 'Hors service' };
+  const t = today(); const C = CATS[e.categorie]; const ctl = eqCtl(e);
+  if (ctl[0] && !ctl[0].conforme) return { k: 'retard', l: 'Contrôle non conforme' };
+  const ech = e.categorie === 'baes' ? [['Batterie à remplacer', e.batterie_remplacement]] : [['Vérification annuelle', e.verification_annuelle], ['Révision décennale', e.revision_decennale]];
+  const exp = ech.find((x) => x[1] && x[1] < t); if (exp) return { k: 'retard', l: exp[0] + (e.categorie === 'baes' ? '' : ' dépassée') };
+  const last = ctl.find((c) => c.type_controle === 'mensuel');
+  if (!last) return { k: 'obs', l: 'Jamais contrôlé' };
+  if (days(last.date_controle) < -(S.params[C.freqKey] || 30)) return { k: 'obs', l: C.controles.mensuel.nom + ' à faire' };
+  if (e.categorie === 'baes') { const au = ctl.find((c) => c.type_controle === 'autonomie'); if (!au || days(au.date_controle) < -(S.params.autonomie_frequence_jours || 182)) return { k: 'obs', l: 'Test d\'autonomie à faire' }; }
+  const soon = ech.find((x) => x[1] && days(x[1]) <= 60); if (soon) return { k: 'proche', l: soon[0] + ' : ' + fr(soon[1]) };
+  return { k: 'ok', l: 'Conforme' };
+}
+function alertesEquipements() {
+  const out = [];
+  for (const [cat, C] of Object.entries(CATS)) for (const x of S.sites) {
+    const items = S.eq.filter((e) => e.categorie === cat && e.site_id === x.id && e.actif); if (!items.length) continue;
+    const groups = {};
+    for (const e of items) { const st = eqStatut(e); if (st.k === 'ok' || st.k === 'vide') continue; const key = st.k + '|' + st.l.replace(/ : .*/, ''); (groups[key] ||= []).push({ e, st }); }
+    for (const [key, list] of Object.entries(groups)) {
+      const rouge = key.startsWith('retard|'); const label = key.split('|')[1];
+      if (list.length === 1 || (rouge && list.length <= 3)) list.forEach(({ e, st }) => out.push({ niveau: rouge ? 'rouge' : 'orange', site: x.id, cat, href: '#/e/' + e.id, texte: (cat === 'baes' ? '' : 'Extincteur ') + e.code + ' : ' + st.l, sub: x.court + (e.zone ? ' · ' + e.zone : '') + (e.emplacement ? ' · ' + e.emplacement : '') }));
+      else out.push({ niveau: rouge ? 'rouge' : 'orange', site: x.id, cat, n: list.length, href: '#/eq/' + cat, eqsite: x.id, texte: list.length + ' ' + C.plur + ' : ' + label.toLowerCase(), sub: x.court + ' · ' + C.titre });
+    }
+  }
+  return out;
+}
+document.addEventListener('click', (e) => { const a = e.target.closest('a[data-eqsite]'); if (a) { S.eqSite = a.dataset.eqsite; S.eqZone = 'all'; if (location.hash === a.getAttribute('href')) { e.preventDefault(); render(); } } });
+function nextCodes(cat, site, n) {
+  const pre = CATS[cat].prefix + '-' + (siteOf(site)?.prefixe || site.slice(0, 3).toUpperCase()) + '-'; const out = []; let i = 1;
+  while (out.length < n) { const c = pre + String(i).padStart(3, '0'); if (!S.eq.some((e) => e.categorie === cat && e.code === c)) out.push(c); i++; }
+  return out;
+}
+const zonesOf = (cat, site) => [...new Set(S.eq.filter((e) => e.categorie === cat && (site === 'all' || e.site_id === site) && e.zone).map((e) => e.zone))].sort((a, b) => a.localeCompare(b));
+function eqFormHTML(cat, e, bulk) {
+  const C = CATS[cat]; const site = e ? e.site_id : (S.eqSite !== 'all' ? S.eqSite : S.mesSites[0]);
+  const f = (id, label, val, type = 'text', ph = '', extra = '') => `<label for="q-${id}">${label}<input id="q-${id}" name="${id}" type="${type}" value="${esc(val ?? '')}" placeholder="${esc(ph)}" ${extra}></label>`;
+  return `<form class="paper box" id="eq-form" novalidate>
+    <div class="sectitle"><h3>${e ? 'Modifier la fiche' : bulk ? 'Ajouter plusieurs ' + C.plur : 'Nouvel ' + (cat === 'baes' ? 'bloc BAES' : 'extincteur')}</h3></div>
+    ${bulk ? `<p class="small muted" style="margin:0">Les codes se suivent automatiquement. Vous pourrez préciser l'emplacement de chacun ensuite, directement depuis sa fiche.</p>` : ''}
+    <div class="grid2">
+      ${e ? '' : `<label for="q-site">Site<select id="q-site" name="site_id">${S.sites.map((s) => `<option value="${s.id}" ${s.id === site ? 'selected' : ''}>${esc(s.nom)}</option>`).join('')}</select></label>`}
+      ${bulk ? f('nombre', 'Nombre à créer', 10, 'number', '', 'min="1" max="100" step="1" inputmode="numeric"') : f('code', 'Code', e ? e.code : nextCodes(cat, site, 1)[0], 'text', C.prefix + '-MAN-001')}
+      <label for="q-zone">Zone ou niveau<input id="q-zone" name="zone" list="q-zones" value="${esc(e?.zone || (S.eqZone !== 'all' ? S.eqZone : ''))}" placeholder="Salle omnisports, vestiaires RDC…"><datalist id="q-zones">${zonesOf(cat, 'all').map((z) => `<option value="${esc(z)}">`).join('')}</datalist></label>
+      ${f('emplacement', 'Emplacement précis', e?.emplacement, 'text', cat === 'baes' ? 'Au-dessus de la porte de sortie' : 'À droite de l\'accueil')}
+      <label for="q-type">Type<select id="q-type" name="type_equipement"><option value="">Non précisé</option>${C.types.map(([k, l]) => `<option value="${k}" ${e?.type_equipement === k ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
+      ${cat === 'extincteur' ? f('capacite', 'Capacité', e?.capacite, 'text', '6 L, 2 kg…') : ''}
+      ${f('marque', 'Marque', e?.marque)}${f('modele', 'Modèle', e?.modele)}
+      ${bulk ? '' : f('numero_serie', 'Numéro de série', e?.numero_serie)}
+      ${f('mise_en_service', 'Mise en service', e?.mise_en_service, 'date')}
+      ${cat === 'baes' ? f('batterie_remplacement', 'Remplacement de la batterie prévu le', e?.batterie_remplacement, 'date')
+        : f('verification_annuelle', 'Prochaine vérification annuelle', e?.verification_annuelle, 'date') + f('revision_decennale', 'Révision décennale (10 ans)', e?.revision_decennale, 'date')}
+      ${cat === 'baes' ? `<label class="chk"><input type="checkbox" id="q-sati" name="sati" ${e?.sati ? 'checked' : ''}>Bloc à autotest (SATI)</label>` : ''}
+      ${e ? `<label class="chk"><input type="checkbox" id="q-actif" name="actif" ${e.actif ? 'checked' : ''}>En service</label>` : ''}
+      <label for="q-remarques" style="grid-column:1/-1">Remarques<input id="q-remarques" name="remarques" value="${esc(e?.remarques || '')}"></label>
+    </div>
+    <div class="actions"><button type="button" id="q-cancel">Annuler</button><button type="submit" class="primary" id="q-save">${bulk ? 'Créer' : 'Enregistrer'}</button></div>
+  </form>`;
+}
+function wireEqForm(cat, e, bulk, done) {
+  const F = $('#eq-form');
+  const siteSel = $('#q-site', F);
+  if (siteSel && !bulk) siteSel.onchange = () => { $('#q-code', F).value = nextCodes(cat, siteSel.value, 1)[0]; };
+  $('#q-cancel', F).onclick = () => done(null);
+  F.onsubmit = async (ev) => {
+    ev.preventDefault();
+    const v = (n) => (F.elements[n] ? String(F.elements[n].value).trim() : '');
+    const row = { zone: v('zone'), emplacement: v('emplacement'), type_equipement: v('type_equipement'), marque: v('marque'), modele: v('modele'), remarques: v('remarques') };
+    if (cat === 'extincteur') row.capacite = v('capacite');
+    if (!bulk) row.numero_serie = v('numero_serie');
+    for (const k of ['mise_en_service', 'batterie_remplacement', 'verification_annuelle', 'revision_decennale']) if (F.elements[k]) row[k] = v(k) || null;
+    if (F.elements.sati) row.sati = F.elements.sati.checked;
+    let res;
+    if (e) {
+      row.code = v('code').toUpperCase(); row.actif = F.elements.actif.checked;
+      if (!row.code) return toast('Indiquez le code.', true);
+      busy($('#q-save', F), true); res = await S.sb.from('reg_equipements').update(row).eq('id', e.id).select().single();
+    } else {
+      const site = v('site_id');
+      const n = bulk ? Math.round(Number(v('nombre'))) : 1;
+      if (!(n >= 1 && n <= 100)) return toast('Indiquez un nombre entre 1 et 100.', true);
+      const codes = bulk ? nextCodes(cat, site, n) : [v('code').toUpperCase()];
+      if (!codes[0]) return toast('Indiquez le code.', true);
+      busy($('#q-save', F), true);
+      res = await S.sb.from('reg_equipements').insert(codes.map((c) => ({ ...row, site_id: site, categorie: cat, code: c }))).select();
+    }
+    busy($('#q-save', F), false);
+    if (res.error) return toast(/duplicate|unique/i.test(res.error.message || '') ? 'Ce code existe déjà.' : errMsg(res.error), true);
+    if (e) Object.assign(e, res.data); else S.eq.push(...res.data);
+    toast(e ? 'Fiche enregistrée' : res.data.length > 1 ? res.data.length + ' ' + CATS[cat].plur + ' ajoutés' : 'Ajouté');
+    done(e ? e : res.data);
+  };
+}
+function eqFilter(cat) {
+  const q = S.eqQ.trim().toLowerCase();
+  return S.eq.filter((e) => e.categorie === cat && (S.eqSite === 'all' || e.site_id === S.eqSite) && (S.eqZone === 'all' || e.zone === S.eqZone)
+    && (!q || [e.code, e.zone, e.emplacement, e.marque].join(' ').toLowerCase().includes(q)))
+    .sort((a, b) => (siteOf(a.site_id)?.ordre || 0) - (siteOf(b.site_id)?.ordre || 0) || (a.zone || '~').localeCompare(b.zone || '~') || a.code.localeCompare(b.code, 'fr', { numeric: true }));
+}
+function siteSeg(attr) {
+  return `<nav class="seg no-print" aria-label="Site"><a href="#" data-${attr}="all" ${S.eqSite === 'all' ? 'aria-current="page"' : ''}>Tous</a>${S.sites.map((s) => `<a href="#" data-${attr}="${s.id}" ${S.eqSite === s.id ? 'aria-current="page"' : ''}>${esc(shortName(s))}</a>`).join('')}</nav>`;
+}
+function renderEq(cat) {
+  if (!S.v2) { main.innerHTML = '<div class="notice warn">Ce suivi nécessite la mise à jour de la base de données (script « mise-a-jour-v2 »).</div>'; return; }
+  const C = CATS[cat];
+  if (S.eqSite !== 'all' && !S.mesSites.includes(S.eqSite)) S.eqSite = 'all';
+  const zones = zonesOf(cat, S.eqSite); if (S.eqZone !== 'all' && !zones.includes(S.eqZone)) S.eqZone = 'all';
+  const list = eqFilter(cat); const st = list.map(eqStatut); const c = (ks) => st.filter((x) => ks.includes(x.k)).length;
+  const freq = S.params[C.freqKey] || 30;
+  const years = [...new Set([String(new Date().getFullYear()), ...S.eqCtlAll.map((x) => x.date_controle.slice(0, 4))])].sort().reverse();
+  let zoneCur = null;
+  main.innerHTML = `
+    <section class="paper cover" style="--sc:${C.color}">
+      <div class="cover-top"><div><span class="eyebrow">Suivi des équipements de sécurité</span><h2>${C.titre}</h2>
+        <p class="small muted" style="margin:4px 0 0">${C.controles.mensuel.nom} tous les ${freq} jours${cat === 'baes' ? ` · test d'autonomie tous les ${S.params.autonomie_frequence_jours || 182} jours` : ' · vérification annuelle par le prestataire'}.</p></div>
+        ${siteSeg('es')}</div>
+      <div class="kpis" style="border-top:1px solid var(--line)">
+        <div class="tile ok"><span class="n num">${c(['ok', 'proche'])} / ${list.filter((e) => e.actif).length}</span><span class="l">Conformes</span></div>
+        <div class="tile obs"><span class="n num">${c(['obs'])}</span><span class="l">Contrôles à faire</span></div>
+        <div class="tile proche"><span class="n num">${c(['proche'])}</span><span class="l">Échéances ≤ 60 j</span></div>
+        <div class="tile retard"><span class="n num">${c(['retard'])}</span><span class="l">En défaut</span></div></div>
+    </section>
+    ${alertesHTML(alertes().filter((a) => a.cat === cat && (S.eqSite === 'all' || a.site === S.eqSite)), 'Alertes ' + C.court, true)}
+    <div class="actions no-print"><a class="primary" href="#/ronde/${cat}" style="display:inline-flex;align-items:center;min-height:46px;padding:8px 16px;border-radius:6px;background:var(--navy);color:var(--navy-fg);font-weight:700;text-decoration:none">✔ Faire une ronde de contrôle</a>
+      <span style="display:flex;gap:8px;flex-wrap:wrap"><a href="#/scan" style="display:inline-flex;align-items:center;min-height:42px;padding:8px 14px;border:1px solid var(--line);border-radius:6px;font-weight:600;text-decoration:none;color:var(--fg);background:var(--paper)">📷 Scanner</a><button type="button" id="eq-add">+ Ajouter</button><button type="button" id="eq-bulk">+ Ajouter plusieurs</button></span></div>
+    <div id="eq-form-slot"></div>
+    <div class="actions no-print" style="align-items:flex-end">
+      <span style="display:flex;gap:8px;flex-wrap:wrap;flex:1;min-width:0"><input id="eq-q" type="search" placeholder="Chercher un code, une zone…" value="${esc(S.eqQ)}" style="max-width:260px">
+        <select id="eq-zone" style="width:auto;max-width:220px" aria-label="Zone"><option value="all">Toutes les zones</option>${zones.map((z) => `<option ${S.eqZone === z ? 'selected' : ''}>${esc(z)}</option>`).join('')}</select></span>
+      <a href="#/etiquettes/${cat}/${S.eqSite !== 'all' ? S.eqSite : ''}" class="small" style="font-weight:600">Étiquettes QR</a></div>
+    <section class="paper daelist" id="eq-list">${list.length ? list.map((e, i) => { const s = st[i]; const last = eqCtl(e)[0];
+      const head = e.zone !== zoneCur ? (zoneCur = e.zone, `<div class="pjgroup" style="padding:10px 16px 4px;border-top:1px solid var(--line)"><span>${esc(e.zone || 'Sans zone')}</span>${S.eqSite === 'all' ? `<span class="small muted">· ${esc(siteOf(e.site_id)?.court || '')}</span>` : ''}</div>`) : '';
+      return head + `<a class="daerow" href="#/e/${e.id}"><span style="display:flex;gap:8px;align-items:center">${e.photo && S.urls[e.photo] ? `<img class="eqthumb" src="${esc(S.urls[e.photo])}" alt="" loading="lazy">` : ''}<span class="daecode">${esc(e.code)}</span></span>
+        <span style="min-width:0"><b>${esc(e.emplacement || typeLabel(e) || '—')}</b><span class="small muted" style="display:block">${esc([typeLabel(e), e.capacite].filter(Boolean).join(' · '))}${last ? ' · contrôlé le ' + fr(last.date_controle) : ' · jamais contrôlé'}</span></span>
+        <span class="pill p-${s.k}">${esc(s.l)}</span></a>`; }).join('')
+      : `<div class="empty">${S.eq.some((e) => e.categorie === cat) ? 'Aucun résultat avec ces filtres.' : `Aucun ${C.un} enregistré. Utilisez « Ajouter plusieurs » pour créer d'un coup tous ceux d'une zone, puis imprimez leurs étiquettes QR.`}</div>`}</section>
+    <section class="paper box no-print"><div class="sectitle"><h3>Exports</h3></div>
+      <div class="actions"><span class="small muted">Fichiers lisibles dans Excel, pour le filtre de site en cours.</span>
+      <span style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button type="button" id="ex-liste">Liste des ${C.plur} (.csv)</button>
+        <select id="ex-annee" class="yearsel" aria-label="Année">${years.map((y) => `<option>${y}</option>`).join('')}</select><button type="button" id="ex-ctl">Contrôles de l'année (.csv)</button></span></div></section>`;
+  $$('[data-es]').forEach((a) => { a.onclick = (ev) => { ev.preventDefault(); S.eqSite = a.dataset.es; S.eqZone = 'all'; renderEq(cat); }; });
+  $('#eq-zone').onchange = (ev) => { S.eqZone = ev.target.value; renderEq(cat); };
+  let tq; $('#eq-q').oninput = (ev) => { clearTimeout(tq); tq = setTimeout(() => { S.eqQ = ev.target.value; renderEq(cat); const i = $('#eq-q'); i.focus(); i.setSelectionRange(i.value.length, i.value.length); }, 250); };
+  const show = (bulk) => { S.eqForm = bulk ? 'bulk' : 'one'; $('#eq-form-slot').innerHTML = eqFormHTML(cat, null, bulk); wireEqForm(cat, null, bulk, (res) => { S.eqForm = null; if (res && res.length === 1) location.hash = '#/e/' + res[0].id; else renderEq(cat); }); $('#eq-form').scrollIntoView({ block: 'start', behavior: 'smooth' }); };
+  $('#eq-add').onclick = () => show(false); $('#eq-bulk').onclick = () => show(true);
+  if (S.eqForm) show(S.eqForm === 'bulk');
+  const scope = () => (S.eqSite === 'all' ? 'tous sites' : siteOf(S.eqSite)?.court);
+  $('#ex-liste').onclick = () => saveBlob(new Blob([csv([['Code', 'Site', 'Zone', 'Emplacement', 'Type', 'Capacité', 'Marque', 'Modèle', 'N° série', 'Mise en service', cat === 'baes' ? 'Batterie à remplacer' : 'Vérification annuelle', cat === 'baes' ? 'SATI' : 'Révision décennale', 'Dernier contrôle', 'État', 'En service', 'Photo'],
+    ...list.map((e) => [e.code, siteOf(e.site_id)?.nom, e.zone, e.emplacement, typeLabel(e), e.capacite, e.marque, e.modele, e.numero_serie, fr(e.mise_en_service), fr(cat === 'baes' ? e.batterie_remplacement : e.verification_annuelle), cat === 'baes' ? (e.sati ? 'oui' : 'non') : fr(e.revision_decennale), eqCtl(e)[0] ? fr(eqCtl(e)[0].date_controle) : '', eqStatut(e).l, e.actif ? 'oui' : 'non', e.photo ? 'oui' : 'non'])])], { type: 'text/csv' }), cleanName(`${C.court} ${scope()} liste ${today()}`) + '.csv');
+  $('#ex-ctl').onclick = () => { const y = $('#ex-annee').value; const ids = new Map(list.map((e) => [e.id, e]));
+    const rows = S.eqCtlAll.filter((x) => ids.has(x.equipement_id) && x.date_controle.startsWith(y)).sort((a, b) => a.date_controle.localeCompare(b.date_controle));
+    saveBlob(new Blob([csv([['Date', 'Code', 'Site', 'Zone', 'Emplacement', 'Type de contrôle', 'Résultat', 'Points en défaut', 'Remarques', 'Par'],
+      ...rows.map((x) => { const e = ids.get(x.equipement_id); const pts = (C.controles[x.type_controle] || C.controles.mensuel).points.filter(([k]) => x.points && x.points[k] === false).map(([, l]) => l);
+        return [fr(x.date_controle), e.code, siteOf(e.site_id)?.nom, e.zone, e.emplacement, (C.controles[x.type_controle] || {}).nom || x.type_controle, x.conforme ? 'Conforme' : 'Non conforme', pts.join(' · '), x.remarques, nameOf(x.cree_par)]; })])], { type: 'text/csv' }), cleanName(`${C.court} ${scope()} controles ${y}`) + '.csv'); };
+}
+// ---------------------------------------------------------------------
+// Scanner d'étiquettes QR (dans l'application)
+// ---------------------------------------------------------------------
+let scanStream = null, scanRAF = 0, jsqrLoading = null, lastBad = '';
+function stopScan() { cancelAnimationFrame(scanRAF); if (scanStream) { scanStream.getTracks().forEach((t) => t.stop()); scanStream = null; } }
+function loadJsQR() {
+  if (window.jsQR) return Promise.resolve();
+  if (!jsqrLoading) jsqrLoading = new Promise((res, rej) => { const sc = document.createElement('script'); sc.src = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js'; sc.onload = res; sc.onerror = () => { jsqrLoading = null; rej(new Error('Impossible de charger le lecteur de QR code. Vérifiez la connexion Internet.')); }; document.head.appendChild(sc); });
+  return jsqrLoading;
+}
+function handleCode(text) {
+  const m = String(text || '').match(/#\/e\/([A-Za-z0-9-]+)/);
+  const e = m && S.eq.find((x) => x.id === m[1]);
+  if (!e) { if (text !== lastBad) { lastBad = text; toast(m ? 'Cet appareil est introuvable, ou vous n\'avez pas accès à son site.' : 'Ce QR code n\'est pas une étiquette du registre.', true); } return false; }
+  stopScan(); lastBad = '';
+  if (navigator.vibrate) navigator.vibrate(80);
+  S.quick = e.id; S.quickDone = null; S.eqCheck = null;
+  location.hash = '#/e/' + e.id;
+  return true;
+}
+function decodeCanvas(cv) {
+  const ctx = cv.getContext('2d', { willReadFrequently: true });
+  const img = ctx.getImageData(0, 0, cv.width, cv.height);
+  return window.jsQR(img.data, cv.width, cv.height, { inversionAttempts: 'attemptBoth' });
+}
+async function renderScan() {
+  stopScan();
+  main.innerHTML = `
+    <section class="paper box" style="align-items:center;text-align:center">
+      <div class="sectitle" style="justify-content:center"><h2>Scanner une étiquette</h2></div>
+      <p class="small muted" style="margin:0">Visez le QR code collé à côté du BAES ou de l'extincteur.</p>
+      <div class="scanbox"><video id="sc-v" playsinline muted autoplay></video><div class="scanframe"></div></div>
+      <p id="sc-msg" class="small muted" style="margin:0">Ouverture de l'appareil photo…</p>
+      <label class="photobtn">📷 Prendre une photo de l'étiquette<input type="file" id="sc-file" accept="image/*" capture="environment"></label>
+      <a href="#/num" class="small" style="font-weight:600">🔢 Étiquette abîmée ? Taper le numéro</a>
+      <button type="button" class="link" id="sc-back">Annuler</button>
+    </section>`;
+  $('#sc-back').onclick = () => { stopScan(); history.length > 1 ? history.back() : (location.hash = '#/sommaire'); };
+  $('#sc-file').onchange = async (ev) => {
+    const f = ev.target.files[0]; if (!f) return;
+    try {
+      await loadJsQR();
+      const bmp = await createImageBitmap(f);
+      const k = Math.min(1, 1400 / Math.max(bmp.width, bmp.height));
+      const cv = document.createElement('canvas'); cv.width = Math.round(bmp.width * k); cv.height = Math.round(bmp.height * k);
+      cv.getContext('2d', { willReadFrequently: true }).drawImage(bmp, 0, 0, cv.width, cv.height);
+      const code = decodeCanvas(cv);
+      if (!code) return toast('QR code illisible : reprenez la photo plus près, bien à plat.', true);
+      handleCode(code.data);
+    } catch (err) { toast(errMsg(err), true); }
+  };
+  const msg = $('#sc-msg');
+  try {
+    await loadJsQR();
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw Object.assign(new Error('no camera'), { name: 'NotSupported' });
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false });
+    if (route().v !== 'scan') { stream.getTracks().forEach((t) => t.stop()); return; }
+    scanStream = stream;
+    const v = $('#sc-v'); v.srcObject = stream; await v.play().catch(() => {});
+    msg.textContent = 'Visez le QR code : la fiche s\'ouvre toute seule.';
+    const cv = document.createElement('canvas'); let last = 0;
+    const tick = (t) => {
+      if (!scanStream) return;
+      if (t - last > 140 && v.readyState >= 2 && v.videoWidth) {
+        last = t; const w = Math.min(720, v.videoWidth); const h = Math.round(v.videoHeight * w / v.videoWidth);
+        cv.width = w; cv.height = h; cv.getContext('2d', { willReadFrequently: true }).drawImage(v, 0, 0, w, h);
+        const code = decodeCanvas(cv);
+        if (code && handleCode(code.data)) return;
+      }
+      scanRAF = requestAnimationFrame(tick);
+    };
+    scanRAF = requestAnimationFrame(tick);
+  } catch (err) {
+    msg.innerHTML = err && err.name === 'NotAllowedError'
+      ? 'L\'accès à l\'appareil photo est refusé. Autorisez-le pour cette application dans les réglages du téléphone, ou utilisez le bouton ci-dessous.'
+      : 'L\'appareil photo ne s\'ouvre pas ici. Utilisez le bouton ci-dessous pour photographier l\'étiquette.';
+    msg.style.color = 'var(--warn)';
+  }
+}
+// ---------------------------------------------------------------------
+// Recherche par numéro
+// ---------------------------------------------------------------------
+const numPart = (code) => String(code).split('-').pop().toLowerCase().replace(/^0+(?=[0-9a-z])/, '');
+function numMatches(q, cat, site) {
+  q = q.trim().toLowerCase().replace(/^n\s*°?\s*/, '').replace(/\s+/g, ''); if (!q) return [];
+  const qn = q.replace(/^0+(?=[0-9a-z])/, '');
+  const res = [];
+  for (const e of S.eq) {
+    if (cat !== 'all' && e.categorie !== cat) continue;
+    if (site && site !== 'all' && e.site_id !== site) continue;
+    const n = numPart(e.code), code = e.code.toLowerCase();
+    let rk = n === qn || code === q ? 0 : n.startsWith(qn) ? 1 : code.includes(q) ? 2 : (e.emplacement + ' ' + e.zone).toLowerCase().includes(q) ? 3 : -1;
+    if (rk >= 0) res.push([rk, e]);
+  }
+  return res.sort((a, b) => a[0] - b[0] || a[1].code.localeCompare(b[1].code, 'fr', { numeric: true })).slice(0, 40);
+}
+function renderNum() {
+  S.numCat ||= 'all'; S.numQ ??= '';
+  if (!S.numSite) { try { S.numSite = localStorage.getItem('reg.numSite') || 'all'; } catch (_) { S.numSite = 'all'; } }
+  const eqSites = S.sites.filter((x) => S.eq.some((e) => e.site_id === x.id));
+  if (S.numSite !== 'all' && !eqSites.some((x) => x.id === S.numSite)) S.numSite = 'all';
+  main.innerHTML = `
+    <section class="paper box">
+      <div class="sectitle"><h2>Aller à un appareil par son numéro</h2></div>
+      <div class="seg" role="group" aria-label="Catégorie" style="align-self:flex-start">${[['all', 'Tous'], ...Object.entries(CATS).map(([k, C]) => [k, C.court])].map(([k, l]) => `<a href="#" data-nc="${k}" ${S.numCat === k ? 'aria-current="page"' : ''}>${esc(l)}</a>`).join('')}</div>
+      ${eqSites.length > 1 ? `<select id="num-site" aria-label="Site" style="font-weight:600"><option value="all">Tous les sites</option>${eqSites.map((x) => `<option value="${x.id}" ${S.numSite === x.id ? 'selected' : ''}>${esc(x.court)}</option>`).join('')}</select>` : ''}
+      <input id="num-q" class="numin" type="search" inputmode="text" autocomplete="off" placeholder="Ex. 12, 04A, 091B…" value="${esc(S.numQ)}">
+      <p class="small muted" style="margin:0">Tapez le numéro inscrit sur l'étiquette ou sur le plan, puis touchez l'appareil pour le contrôler.</p>
+    </section>
+    <section class="paper daelist numres" id="num-res"></section>`;
+  const show = () => {
+    const m = numMatches(S.numQ, S.numCat, S.numSite);
+    $('#num-res').innerHTML = !S.numQ.trim() ? '<div class="empty">Le résultat s\'affiche pendant la saisie.</div>'
+      : m.length ? m.map(([, e]) => { const st = eqStatut(e); return `<a class="daerow" href="#/e/${e.id}" data-go="${e.id}"><span class="daecode">${esc(e.code)}</span>
+        <span style="min-width:0"><b>${esc(e.emplacement || typeLabel(e) || '—')}</b><span class="small muted" style="display:block">${esc([CATS[e.categorie].court, siteOf(e.site_id)?.court, e.zone, typeLabel(e)].filter(Boolean).join(' · '))}</span></span>
+        <span class="pill p-${st.k}">${esc(st.l)}</span></a>`; }).join('')
+      : '<div class="empty">Aucun appareil avec ce numéro.</div>';
+    $$('[data-go]').forEach((a) => { a.onclick = () => { S.quick = a.dataset.go; S.quickDone = null; S.eqCheck = null; }; });
+  };
+  const i = $('#num-q');
+  i.oninput = () => { S.numQ = i.value; show(); };
+  i.onkeydown = (ev) => { if (ev.key !== 'Enter') return; const m = numMatches(S.numQ, S.numCat, S.numSite); const ex = m.filter((x) => x[0] === 0);
+    const one = ex.length === 1 ? ex[0][1] : m.length === 1 ? m[0][1] : null; if (one) { i.blur(); S.quick = one.id; S.quickDone = null; S.eqCheck = null; location.hash = '#/e/' + one.id; } };
+  const ns = $('#num-site'); if (ns) ns.onchange = () => { S.numSite = ns.value; try { localStorage.setItem('reg.numSite', ns.value); } catch (_) {} show(); i.focus(); };
+  $$('[data-nc]').forEach((a) => { a.onclick = (ev) => { ev.preventDefault(); S.numCat = a.dataset.nc; renderNum(); }; });
+  show(); setTimeout(() => { i.focus(); i.select(); }, 50);
+}
+
+// ---------------------------------------------------------------------
+// Appareil photo intégré (pour toutes les photos de l'application)
+// ---------------------------------------------------------------------
+let camStream = null;
+function closeCam() { if (camStream) { camStream.getTracks().forEach((t) => t.stop()); camStream = null; } const o = $('#cam'); if (o) o.remove(); document.body.style.overflow = ''; }
+async function openCam(input) {
+  closeCam();
+  const o = document.createElement('div'); o.className = 'cam'; o.id = 'cam';
+  o.innerHTML = `<div class="cammsg" id="cam-msg">Ouverture de l'appareil photo…</div><video id="cam-v" playsinline muted autoplay></video>
+    <div class="cambar"><button type="button" id="cam-x">Annuler</button><button type="button" class="shoot" id="cam-shoot" aria-label="Prendre la photo" disabled></button><button type="button" id="cam-gal">🖼 Galerie</button></div>`;
+  document.body.appendChild(o); document.body.style.overflow = 'hidden';
+  const native = () => { closeCam(); input.dataset.native = '1'; input.click(); setTimeout(() => delete input.dataset.native, 500); };
+  $('#cam-x').onclick = closeCam; $('#cam-gal').onclick = native;
+  try {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw new Error('none');
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1440 } }, audio: false });
+    if (!$('#cam')) { stream.getTracks().forEach((t) => t.stop()); return; }
+    camStream = stream; const v = $('#cam-v'); v.srcObject = stream; await v.play().catch(() => {});
+    $('#cam-msg').textContent = 'Cadrez l\'appareil puis touchez le rond blanc.';
+    const b = $('#cam-shoot'); b.disabled = false;
+    b.onclick = () => {
+      if (!v.videoWidth) return;
+      const k = Math.min(1, 1600 / Math.max(v.videoWidth, v.videoHeight));
+      const cv = document.createElement('canvas'); cv.width = Math.round(v.videoWidth * k); cv.height = Math.round(v.videoHeight * k);
+      cv.getContext('2d').drawImage(v, 0, 0, cv.width, cv.height);
+      cv.toBlob((blob) => {
+        if (!blob) return toast('La photo n\'a pas pu être prise.', true);
+        const f = new File([blob], 'photo-' + Date.now() + '.jpg', { type: 'image/jpeg' });
+        closeCam();
+        try { const dt = new DataTransfer(); dt.items.add(f); input.files = dt.files; } catch (_) { return toast('Ce navigateur ne permet pas la photo intégrée : utilisez « Galerie ».', true); }
+        if (navigator.vibrate) navigator.vibrate(40);
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+      }, 'image/jpeg', 0.85);
+    };
+  } catch (err) {
+    if (err && err.name === 'NotAllowedError') { const m = $('#cam-msg'); if (m) { m.textContent = 'L\'accès à l\'appareil photo est refusé. Autorisez-le dans les réglages du téléphone, ou utilisez « Galerie ».'; m.style.color = '#ffb4a8'; } }
+    else native();
+  }
+}
+document.addEventListener('click', (ev) => {
+  const lab = ev.target.closest && ev.target.closest('label.photobtn'); if (!lab) return;
+  const input = lab.querySelector('input[type=file]'); if (!input || input.id === 'sc-file' || input.dataset.native) return;
+  ev.preventDefault(); openCam(input);
+}, true);
+window.addEventListener('hashchange', closeCam);
+
+async function uploadEqPhoto(file, e, kind) {
+  if (!file) throw new Error('Choisissez une photo.');
+  let type = fileType(file);
+  if (!/^image\/(jpeg|png|webp)$/.test(type) && /^image\//.test(file.type || '')) type = 'image/jpeg';
+  if (!/^image\/(jpeg|png|webp)$/.test(type)) throw new Error('Choisissez une photo (JPG, PNG ou WEBP).');
+  const sh = await shrinkPhoto(file, type);
+  if (sh.blob.size > 20 * 1048576) throw new Error('Photo trop lourde : 20 Mo maximum.');
+  const ext = sh.type === 'image/png' ? 'png' : sh.type === 'image/webp' ? 'webp' : 'jpg';
+  const path = e.site_id + '/equipements/' + e.id + '/' + kind + '-' + (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2)) + '.' + ext;
+  const up = await S.sb.storage.from('registres').upload(path, sh.blob, { contentType: sh.type, upsert: false });
+  if (up.error) throw up.error;
+  const sg = await S.sb.storage.from('registres').createSignedUrl(path, 3600);
+  if (sg.data) S.urls[path] = sg.data.signedUrl;
+  return path;
+}
+const photoInput = (id, label) => `<label class="photobtn">📷 ${label}<input type="file" id="${id}" accept="image/*"></label>`;
+function renderEqFiche(id) {
+  if (S.quick && S.quick !== id) S.quick = null;
+  if (S.quickDone && S.quickDone !== id) S.quickDone = null;
+  const e = S.eq.find((x) => x.id === id);
+  if (!e) { main.innerHTML = `<div class="paper empty">Cet équipement est introuvable, ou vous n'avez pas accès à son site.</div>`; return; }
+  const C = CATS[e.categorie]; const st = eqStatut(e); const hist = eqCtl(e);
+  const lastOf = (t) => hist.find((c) => c.type_controle === t);
+  const dt = (lab, v) => { if (!v) return `<div><div class="eyebrow">${lab}</div><div class="val">—</div></div>`; const k = v < today() ? 'retard' : days(v) <= 60 ? 'proche' : 'ok'; return `<div><div class="eyebrow">${lab}</div><div class="val num">${fr(v)} ${k !== 'ok' ? `<span class="pill p-${k}">${k === 'retard' ? 'Dépassé' : 'Bientôt'}</span>` : ''}</div></div>`; };
+  main.innerHTML = `
+    <div class="no-print"><a href="#/eq/${e.categorie}" class="small" style="font-weight:600">‹ Tous les ${C.plur}</a></div>
+    <section class="paper cover" style="--sc:${C.color}">
+      <div class="cover-top"><div><span class="eyebrow">${esc(C.etiquette)} · ${esc(siteOf(e.site_id)?.nom || '')}${e.zone ? ' · ' + esc(e.zone) : ''}</span><h2>${esc(e.code)}${e.emplacement ? ' · ' + esc(e.emplacement) : ''}</h2>
+        <div style="margin-top:6px"><span class="pill p-${st.k}">${esc(st.l)}</span></div></div></div>
+      <div class="fiche">
+        ${Object.entries(C.controles).map(([t, d]) => { const l = lastOf(t); return `<div><div class="eyebrow">${d.nom}</div><div class="val num">${l ? fr(l.date_controle) + (l.conforme ? '' : ' <span class="pill p-nc">NC</span>') : 'Jamais'}</div></div>`; }).join('')}
+        ${e.categorie === 'baes' ? dt('Batterie à remplacer', e.batterie_remplacement) : dt('Vérification annuelle', e.verification_annuelle) + dt('Révision décennale', e.revision_decennale)}
+        <div><div class="eyebrow">Appareil</div><div class="val">${esc([typeLabel(e), e.capacite].filter(Boolean).join(' · ') || '—')}<br><span class="small muted">${esc([e.marque, e.modele, e.numero_serie ? 'N° ' + e.numero_serie : '', e.sati ? 'Autotest SATI' : ''].filter(Boolean).join(' · '))}</span></div></div>
+      </div>
+      <div class="eqphoto">${e.photo && S.urls[e.photo] ? `<a href="${esc(S.urls[e.photo])}" target="_blank" rel="noopener"><img src="${esc(S.urls[e.photo])}" alt="Photo de ${esc(e.code)}"></a>` : '<div class="ph-empty">Pas encore de photo</div>'}
+        <div class="no-print" style="display:flex;flex-direction:column;gap:8px;align-items:flex-start"><span class="eyebrow">Photo de l'appareil</span>
+          ${photoInput('eq-photo', e.photo ? 'Changer la photo' : 'Ajouter une photo')}
+          ${e.photo ? `<button type="button" class="link danger small" id="eq-photo-del">${S.confirm === 'ph' + e.id ? 'Confirmer : retirer la photo' : 'Retirer la photo'}</button>` : ''}
+          <span class="small muted">Prenez l'appareil et son environnement, étiquette visible.</span></div></div>
+    </section>
+    <div id="eq-check-slot"></div>
+    <section style="display:flex;flex-direction:column;gap:10px"><div class="sectitle"><h3>Historique des contrôles</h3><span class="small muted num">${hist.length}</span></div>
+      ${hist.length ? `<div class="paper tablewrap"><table><thead><tr><th>Date</th><th>Contrôle</th><th>Résultat</th><th>Points en défaut</th><th>Remarques</th><th>Photo</th><th>Par</th></tr></thead><tbody>${hist.map((c) => { const d = C.controles[c.type_controle] || C.controles.mensuel; const bad = d.points.filter(([k]) => c.points && c.points[k] === false).map(([, l]) => l);
+        return `<tr><td class="num">${fr(c.date_controle)}</td><td class="small">${esc(d.nom)}${c.points && c.points.ronde ? '<br><span class="muted">Ronde</span>' : ''}</td><td>${c.conforme ? '<span class="pill p-ok">Conforme</span>' : '<span class="pill p-nc">Non conforme</span>'}</td><td class="small">${esc(bad.join(' · ')) || '—'}</td><td class="small">${esc(c.remarques) || '—'}</td><td class="small">${c.photo && S.urls[c.photo] ? `<a href="${esc(S.urls[c.photo])}" target="_blank" rel="noopener"><img class="eqthumb" src="${esc(S.urls[c.photo])}" alt="Photo du contrôle"></a>` : '—'}</td><td class="small">${esc(nameOf(c.cree_par)) || '—'}</td></tr>`; }).join('')}</tbody></table></div>`
+      : '<div class="paper empty small">Aucun contrôle enregistré.</div>'}</section>
+    <section class="paper box no-print"><div class="sectitle"><h3>QR code</h3></div>
+      <div class="qrbox"><div class="qr">${qrSVG(appBase() + '#/e/' + e.id)}</div><div class="small" style="min-width:0;flex:1"><p style="margin:0 0 8px">Collez l'étiquette à côté de l'appareil. En la scannant avec l'appareil photo du téléphone, cette fiche s'ouvre directement pour le contrôle.</p>
+        <a href="#/etiquettes/${e.categorie}/${e.id}" style="font-weight:600">Imprimer l'étiquette</a></div></div></section>
+    <div class="no-print" id="eq-edit-slot"><button type="button" id="eq-edit">Modifier la fiche (zone, emplacement, dates…)</button></div>
+    ${S.admin ? `<div class="no-print"><button type="button" class="link danger" id="eq-del">${S.confirm === 'eq' + e.id ? 'Confirmer : supprimer cet équipement et son historique' : 'Supprimer cet équipement'}</button></div>` : ''}`;
+  renderEqCheck(e);
+  $('#eq-photo').onchange = async (ev) => {
+    const f = ev.target.files[0]; if (!f) return;
+    toast('Envoi de la photo…');
+    try {
+      const old = e.photo; const path = await uploadEqPhoto(f, e, 'photo');
+      const { error } = await S.sb.from('reg_equipements').update({ photo: path }).eq('id', e.id);
+      if (error) { await S.sb.storage.from('registres').remove([path]); throw error; }
+      e.photo = path; if (old) S.sb.storage.from('registres').remove([old]);
+      toast('Photo enregistrée'); renderEqFiche(id);
+    } catch (err) { toast(errMsg(err), true); }
+  };
+  const phDel = $('#eq-photo-del');
+  if (phDel) phDel.onclick = async () => {
+    if (S.confirm !== 'ph' + e.id) { S.confirm = 'ph' + e.id; return renderEqFiche(id); }
+    S.confirm = null; const old = e.photo;
+    const { error } = await S.sb.from('reg_equipements').update({ photo: '' }).eq('id', e.id);
+    if (error) return toast(errMsg(error), true);
+    e.photo = ''; S.sb.storage.from('registres').remove([old]); toast('Photo retirée'); renderEqFiche(id);
+  };
+  $('#eq-edit').onclick = () => { $('#eq-edit-slot').innerHTML = eqFormHTML(e.categorie, e, false) + ''; const F = $('#eq-form'); F.querySelector('.grid2').insertAdjacentHTML('afterbegin', `<label for="q-code">Code<input id="q-code" name="code" value="${esc(e.code)}"></label>`); wireEqForm(e.categorie, e, false, () => renderEqFiche(id)); F.scrollIntoView({ block: 'start', behavior: 'smooth' }); };
+  const del = $('#eq-del');
+  if (del) del.onclick = async () => {
+    if (S.confirm !== 'eq' + e.id) { S.confirm = 'eq' + e.id; return renderEqFiche(id); }
+    S.confirm = null;
+    const { error } = await S.sb.from('reg_equipements').delete().eq('id', e.id);
+    if (error) return toast(errMsg(error), true);
+    S.eq = S.eq.filter((x) => x.id !== e.id); toast('Équipement supprimé'); location.hash = '#/eq/' + e.categorie;
+  };
+}
+function renderEqCheck(e) {
+  const C = CATS[e.categorie]; const slot = $('#eq-check-slot');
+  if (S.quickDone === e.id && (!S.eqCheck || S.eqCheck.id !== e.id)) {
+    const last = eqCtl(e)[0];
+    slot.innerHTML = `<section class="visitform" style="border-color:${last && !last.conforme ? 'var(--bad)' : 'var(--ok)'}"><div class="sectitle"><h3>${last && !last.conforme ? '✖' : '✔'} ${esc(e.code)} : contrôle enregistré${last && !last.conforme ? ' (non conforme)' : ''}</h3></div>
+      <div class="actions"><button type="button" id="q-done">Terminer</button><span style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" id="q-num" style="min-height:58px;font-size:1.05rem">🔢 Numéro suivant</button><button type="button" class="primary" id="q-next" style="min-height:58px;font-size:1.05rem">📷 Scanner le suivant</button></span></div></section>`;
+    $('#q-next').onclick = () => { S.quickDone = null; location.hash = '#/scan'; };
+    $('#q-num').onclick = () => { S.quickDone = null; S.numQ = ''; location.hash = '#/num'; };
+    $('#q-done').onclick = () => { S.quickDone = null; renderEqCheck(e); };
+    setTimeout(() => slot.scrollIntoView({ block: 'start' }), 60);
+    return;
+  }
+  if (S.quick === e.id && (!S.eqCheck || S.eqCheck.id !== e.id)) {
+    const D = C.controles.mensuel;
+    slot.innerHTML = `<section class="visitform"><div class="sectitle"><h3>Contrôle rapide · ${esc(e.code)}</h3><span class="small muted">${esc(D.nom)} du ${fr(today())}</span></div>
+      <p class="small muted" style="margin:0">Points vérifiés : ${esc(D.points.map(([, l]) => l.toLowerCase()).join(' ; '))}.</p>
+      <div class="quick"><button type="button" class="qok" id="q-ok">✔ Tout est OK</button><button type="button" class="qko" id="q-ko">✖ Problème</button></div>
+      ${Object.keys(C.controles).length > 1 ? '<button type="button" class="link" id="q-other">Faire un autre contrôle (test d\'autonomie…)</button>' : ''}</section>`;
+    $('#q-ok').onclick = async (ev) => {
+      busy(ev.target, true);
+      const points = Object.fromEntries(D.points.map(([k]) => [k, true])); points.scan = true;
+      const { data, error } = await S.sb.from('reg_equip_controles').insert({ equipement_id: e.id, date_controle: today(), type_controle: 'mensuel', points, conforme: true, remarques: '', cree_par: S.me.id }).select().single();
+      busy(ev.target, false);
+      if (error) return toast(errMsg(error), true);
+      S.eqCtlAll.push(data); indexEq(); S.quick = null; S.quickDone = e.id;
+      if (navigator.vibrate) navigator.vibrate(60);
+      toast(e.code + ' : conforme'); render(); window.scrollTo(0, 0);
+    };
+    $('#q-ko').onclick = () => { S.eqCheck = { id: e.id, type: 'mensuel', points: {}, date: today(), remarques: '', fromScan: true }; S.quick = null; renderEqCheck(e); slot.scrollIntoView({ block: 'start', behavior: 'smooth' }); };
+    setTimeout(() => slot.scrollIntoView({ block: 'start' }), 60);
+    const qo = $('#q-other'); if (qo) qo.onclick = () => { S.quick = null; renderEqCheck(e); };
+    return;
+  }
+  if (!S.eqCheck || S.eqCheck.id !== e.id) {
+    slot.innerHTML = `<div style="display:flex;gap:8px;flex-wrap:wrap">${Object.entries(C.controles).map(([t, d], i) => `<button type="button" class="${i ? '' : 'primary'}" data-ckt="${t}" style="flex:1;min-width:200px;min-height:54px;font-size:1.02rem">✔ ${d.nom}</button>`).join('')}</div>`;
+    $$('[data-ckt]', slot).forEach((b) => { b.onclick = () => { S.eqCheck = { id: e.id, type: b.dataset.ckt, points: {}, date: today(), remarques: '' }; renderEqCheck(e); slot.scrollIntoView({ block: 'start', behavior: 'smooth' }); }; });
+    return;
+  }
+  const c = S.eqCheck; const D = C.controles[c.type];
+  slot.innerHTML = `<section class="visitform"><div class="sectitle"><h3>${D.nom} · ${esc(e.code)}</h3></div>
+    <label for="ck-date" style="max-width:220px">Date<input type="date" id="ck-date" value="${c.date}"></label>
+    <div class="checks2">${D.points.map(([k, l]) => `<div class="ck ${c.points[k] === false ? 'bad' : ''}"><span>${esc(l)}</span><span class="opts">
+      <button type="button" class="yes" data-pt="${k}" data-v="1" aria-pressed="${c.points[k] === true}">OK</button><button type="button" class="no" data-pt="${k}" data-v="0" aria-pressed="${c.points[k] === false}">Problème</button></span></div>`).join('')}</div>
+    <button type="button" class="link" id="ck-all">Tout est OK</button>
+    <div class="ckphoto">${photoInput('ck-photo', c.file ? 'Changer la photo' : 'Photo (facultatif)')}${c.preview ? `<img src="${c.preview}" alt="Aperçu">` : ''}${Object.values(c.points).includes(false) && !c.file ? '<span class="small muted">Conseillé pour montrer le problème.</span>' : ''}</div>
+    <label for="ck-rem">Remarques${Object.values(c.points).includes(false) ? ' (décrivez le problème)' : ''}<textarea id="ck-rem" placeholder="${e.categorie === 'baes' ? 'Ne s\'allume plus, batterie HS…' : 'Goupille absente, manomètre dans le rouge…'}">${esc(c.remarques)}</textarea></label>
+    <div class="actions"><button type="button" id="ck-cancel">Annuler</button><button type="button" class="primary" id="ck-save">Valider le contrôle</button></div></section>`;
+  $('#ck-date').onchange = (ev) => { c.date = ev.target.value; };
+  $('#ck-rem').oninput = (ev) => { c.remarques = ev.target.value; };
+  $$('[data-pt]', slot).forEach((b) => { b.onclick = () => { c.points[b.dataset.pt] = b.dataset.v === '1'; renderEqCheck(e); }; });
+  $('#ck-all').onclick = () => { D.points.forEach(([k]) => { c.points[k] = true; }); renderEqCheck(e); };
+  $('#ck-photo').onchange = (ev) => { const f = ev.target.files[0]; if (!f) return; if (c.preview) URL.revokeObjectURL(c.preview); c.file = f; c.preview = URL.createObjectURL(f); renderEqCheck(e); };
+  $('#ck-cancel').onclick = () => { if (c.preview) URL.revokeObjectURL(c.preview); S.eqCheck = null; renderEqCheck(e); };
+  $('#ck-save').onclick = async (ev) => {
+    const missing = D.points.filter(([k]) => typeof c.points[k] !== 'boolean');
+    if (missing.length) return toast('Répondez à tous les points (' + missing.length + ' restant' + (missing.length > 1 ? 's' : '') + ').', true);
+    if (!c.date) return toast('Indiquez la date du contrôle.', true);
+    const conforme = D.points.every(([k]) => c.points[k]);
+    if (!conforme && !c.remarques.trim()) return toast('Décrivez le problème dans les remarques.', true);
+    busy(ev.target, true);
+    let photo = '';
+    if (c.file) { try { toast('Envoi de la photo…'); photo = await uploadEqPhoto(c.file, e, 'controle'); } catch (err) { busy(ev.target, false); return toast(errMsg(err), true); } }
+    const { data, error } = await S.sb.from('reg_equip_controles').insert({ equipement_id: e.id, date_controle: c.date, type_controle: c.type, points: c.points, conforme, remarques: c.remarques.trim(), photo, cree_par: S.me.id }).select().single();
+    busy(ev.target, false);
+    if (error) { if (photo) S.sb.storage.from('registres').remove([photo]); return toast(errMsg(error), true); }
+    if (c.preview) URL.revokeObjectURL(c.preview);
+    S.eqCtlAll.push(data); indexEq(); if (c.fromScan) S.quickDone = e.id; S.eqCheck = null;
+    if (conforme) toast('Contrôle enregistré : conforme'); else toast(e.code + ' NON CONFORME : une alerte est affichée pour l\'équipe.', true);
+    render(); window.scrollTo(0, 0);
+  };
+}
+function renderRonde(cat) {
+  if (!S.v2) { main.innerHTML = '<div class="notice warn">Mise à jour de la base de données nécessaire.</div>'; return; }
+  const C = CATS[cat];
+  if (!S.ronde || S.ronde.cat !== cat) S.ronde = { cat, type: 'mensuel', date: today(), res: {}, rem: {} };
+  const R = S.ronde;
+  if (S.eqSite === 'all' && S.mesSites.length === 1) S.eqSite = S.mesSites[0];
+  const zones = zonesOf(cat, S.eqSite); if (S.eqZone !== 'all' && !zones.includes(S.eqZone)) S.eqZone = 'all';
+  const q = S.eqQ; S.eqQ = ''; const list = eqFilter(cat).filter((e) => e.actif); S.eqQ = q;
+  const nOk = list.filter((e) => R.res[e.id] === true).length, nNo = list.filter((e) => R.res[e.id] === false).length;
+  main.innerHTML = `
+    <div><a href="#/eq/${cat}" class="small" style="font-weight:600">‹ ${C.titre}</a></div>
+    <section class="paper cover" style="--sc:${C.color}"><div class="cover-top"><div><span class="eyebrow">Ronde de contrôle</span><h2>${C.titre}</h2></div>${siteSeg('rs')}</div>
+      <div class="box" style="border-top:1px solid var(--line)"><div class="grid2">
+        ${Object.keys(C.controles).length > 1 ? `<label for="rd-type">Type de contrôle<select id="rd-type">${Object.entries(C.controles).map(([k, d]) => `<option value="${k}" ${R.type === k ? 'selected' : ''}>${d.nom}</option>`).join('')}</select></label>` : ''}
+        <label for="rd-zone">Zone<select id="rd-zone"><option value="all">Toutes les zones</option>${zones.map((z) => `<option ${S.eqZone === z ? 'selected' : ''}>${esc(z)}</option>`).join('')}</select></label>
+        <label for="rd-date">Date<input type="date" id="rd-date" value="${R.date}"></label></div>
+        <p class="small muted" style="margin:0">Points vérifiés pour chaque appareil : ${esc(C.controles[R.type].points.map(([, l]) => l.toLowerCase()).join(' ; '))}.</p></div></section>
+    <div class="actions"><span class="small num"><b>${nOk + nNo} / ${list.length}</b> vérifiés · ${nOk} OK · <span style="color:var(--bad)">${nNo} problème${nNo > 1 ? 's' : ''}</span></span><button type="button" id="rd-all">Tout marquer OK</button></div>
+    <section class="paper daelist">${list.length ? list.map((e) => `<div class="daerow" style="grid-template-columns:auto minmax(0,1fr)"><span class="daecode">${esc(e.code)}</span>
+      <span style="min-width:0;display:flex;flex-direction:column;gap:6px"><span><b>${esc(e.emplacement || e.zone || '—')}</b><span class="small muted" style="display:block">${esc([e.zone, typeLabel(e)].filter(Boolean).join(' · '))}</span></span>
+      <span class="ck ${R.res[e.id] === false ? 'bad' : ''}" style="padding:0;border:none;grid-template-columns:1fr"><span class="opts"><button type="button" class="yes" data-rd="${e.id}" data-v="1" aria-pressed="${R.res[e.id] === true}" style="flex:1">OK</button><button type="button" class="no" data-rd="${e.id}" data-v="0" aria-pressed="${R.res[e.id] === false}" style="flex:1">Problème</button></span></span>
+      ${R.res[e.id] === false ? `<input data-rem="${e.id}" value="${esc(R.rem[e.id] || '')}" placeholder="Quel problème ? (obligatoire)" aria-label="Problème constaté sur ${esc(e.code)}">
+        <span class="ckphoto"><label class="photobtn">📷 ${R.ph && R.ph[e.id] ? 'Changer la photo' : 'Photo (facultatif)'}<input type="file" accept="image/*" data-rph="${e.id}"></label>${R.ph && R.ph[e.id] ? `<img src="${R.ph[e.id].url}" alt="Aperçu">` : ''}</span>` : ''}</span></div>`).join('')
+      : `<div class="empty">Aucun ${C.un} en service ${S.eqSite === 'all' ? '' : 'sur ce site '}${S.eqZone !== 'all' ? 'dans cette zone' : ''}.</div>`}</section>
+    <div class="actions"><span class="small muted">Seuls les appareils marqués OK ou Problème sont enregistrés.</span><button type="button" class="primary" id="rd-save" style="min-height:50px">Enregistrer la ronde (${nOk + nNo})</button></div>`;
+  $$('[data-rs]').forEach((a) => { a.onclick = (ev) => { ev.preventDefault(); S.eqSite = a.dataset.rs; S.eqZone = 'all'; renderRonde(cat); }; });
+  const t = $('#rd-type'); if (t) t.onchange = (ev) => { R.type = ev.target.value; renderRonde(cat); };
+  $('#rd-zone').onchange = (ev) => { S.eqZone = ev.target.value; renderRonde(cat); };
+  $('#rd-date').onchange = (ev) => { R.date = ev.target.value; };
+  $('#rd-all').onclick = () => { list.forEach((e) => { if (R.res[e.id] !== false) R.res[e.id] = true; }); renderRonde(cat); };
+  $$('[data-rd]').forEach((b) => { b.onclick = () => { const y = window.scrollY; R.res[b.dataset.rd] = b.dataset.v === '1'; renderRonde(cat); window.scrollTo(0, y); if (b.dataset.v === '0') $(`[data-rem="${b.dataset.rd}"]`)?.focus(); }; });
+  $$('[data-rem]').forEach((i) => { i.oninput = () => { R.rem[i.dataset.rem] = i.value; }; });
+  $$('[data-rph]').forEach((i) => { i.onchange = () => { const f = i.files[0]; if (!f) return; R.ph ||= {}; if (R.ph[i.dataset.rph]) URL.revokeObjectURL(R.ph[i.dataset.rph].url); R.ph[i.dataset.rph] = { file: f, url: URL.createObjectURL(f) }; const y = window.scrollY; renderRonde(cat); window.scrollTo(0, y); }; });
+  $('#rd-save').onclick = async (ev) => {
+    const ids = Object.keys(R.res).filter((id) => S.eq.some((e) => e.id === id));
+    if (!ids.length) return toast('Marquez au moins un appareil OK ou Problème.', true);
+    const sans = ids.filter((id) => R.res[id] === false && !(R.rem[id] || '').trim());
+    if (sans.length) { $(`[data-rem="${sans[0]}"]`)?.focus(); return toast('Décrivez le problème pour chaque appareil marqué « Problème ».', true); }
+    if (!R.date) return toast('Indiquez la date.', true);
+    busy(ev.target, true);
+    const photos = {};
+    for (const id of ids) { const ph = R.ph && R.ph[id]; if (!ph || R.res[id] !== false) continue;
+      try { toast('Envoi des photos…'); photos[id] = await uploadEqPhoto(ph.file, S.eq.find((e) => e.id === id), 'controle'); } catch (err) { busy(ev.target, false); return toast(errMsg(err), true); } }
+    const rows = ids.map((id) => ({ equipement_id: id, date_controle: R.date, type_controle: R.type, points: { ronde: true }, conforme: R.res[id], remarques: (R.rem[id] || '').trim(), photo: photos[id] || '', cree_par: S.me.id }));
+    const { data, error } = await S.sb.from('reg_equip_controles').insert(rows).select();
+    busy(ev.target, false);
+    if (error) return toast(errMsg(error), true);
+    S.eqCtlAll.push(...data); indexEq();
+    const nb = rows.filter((r) => !r.conforme).length;
+    S.ronde = null;
+    toast(nb ? `Ronde enregistrée : ${rows.length} contrôles, dont ${nb} NON CONFORME${nb > 1 ? 'S' : ''} (alerte affichée).` : `Ronde enregistrée : ${rows.length} contrôles conformes.`, !!nb);
+    location.hash = '#/eq/' + cat;
+  };
+}
+function renderEtiquettes(cat, arg) {
+  const C = CATS[cat];
+  let list = S.eq.filter((e) => e.categorie === cat && e.actif); let titre = 'Tous les ' + C.plur;
+  if (arg && S.eq.some((e) => e.id === arg)) { list = S.eq.filter((e) => e.id === arg); titre = list[0].code; }
+  else if (arg && S.mesSites.includes(arg)) { list = list.filter((e) => e.site_id === arg); titre = siteOf(arg)?.nom || ''; }
+  const zones = [...new Set(list.map((e) => e.zone).filter(Boolean))].sort();
+  if (S.lbZone && zones.includes(S.lbZone)) list = list.filter((e) => e.zone === S.lbZone);
+  list.sort((a, b) => a.code.localeCompare(b.code, 'fr', { numeric: true }));
+  const FMT = { 18: [3, 6], 24: [3, 8], 40: [4, 10] };
+  if (!S.lbFmt) { try { S.lbFmt = localStorage.getItem('reg.lbFmt') || '24'; S.lbCut = localStorage.getItem('reg.lbCut') === '1'; } catch (_) { S.lbFmt = '24'; } }
+  if (!FMT[S.lbFmt]) S.lbFmt = '24';
+  const N = FMT[S.lbFmt][0] * FMT[S.lbFmt][1];
+  S.lbStart = Math.min(N, Math.max(1, parseInt(S.lbStart, 10) || 1));
+  const cells = [...Array(S.lbStart - 1).fill(null), ...list];
+  const pages = []; for (let k = 0; k < cells.length; k += N) pages.push(cells.slice(k, k + N));
+  const cellHTML = (e) => !e ? '<div class="cell"></div>' : `<div class="cell"><div class="q">${qrSVG(appBase() + '#/e/' + e.id)}</div><div class="tx">
+    <div class="c1" style="color:${C.color}">${esc(C.etiquette)}</div><div class="c2">${esc(e.code)}</div>
+    <div class="c3">${esc(e.emplacement || e.zone || '')}</div><div class="c4">${esc(siteOf(e.site_id)?.court || '')} · Scannez pour le contrôle</div></div></div>`;
+  main.innerHTML = `
+    <div class="no-print" style="display:flex;flex-direction:column;gap:10px"><a href="#/eq/${cat}" class="small" style="font-weight:600">‹ ${C.titre}</a>
+      <div class="actions"><div class="sectitle"><h2>Étiquettes QR</h2><span class="small muted">${esc(titre)} · ${list.length} étiquette${list.length > 1 ? 's' : ''} · ${pages.length} page${pages.length > 1 ? 's' : ''} A4</span></div>
+        <span style="display:flex;gap:8px;align-items:center">${zones.length > 1 ? `<select id="lb-zone" style="width:auto" aria-label="Zone"><option value="">Toutes les zones</option>${zones.map((z) => `<option ${S.lbZone === z ? 'selected' : ''}>${esc(z)}</option>`).join('')}</select>` : ''}<button type="button" class="primary" id="lb-print">Imprimer</button></span></div>
+      <div class="lbopts">
+        <div class="seg" role="group" aria-label="Format">${Object.keys(FMT).map((f) => `<a href="#" data-fmt="${f}" ${S.lbFmt === f ? 'aria-current="page"' : ''}>${f} par page</a>`).join('')}</div>
+        <label>Commencer à la case <input type="number" id="lb-start" min="1" max="${N}" value="${S.lbStart}"></label>
+        <label><input type="checkbox" id="lb-cut" ${S.lbCut ? 'checked' : ''}> Traits de découpe</label>
+      </div>
+      <p class="small muted" style="margin:0">Planches A4 de ${N} étiquettes (${S.lbFmt === '40' ? '52,5 × 29,7 mm' : S.lbFmt === '24' ? '70 × 37 mm' : '70 × 49,5 mm'}). À l'impression, choisissez <b>Marges : aucune</b> et <b>Échelle : 100 %</b>. « Commencer à la case » sert à finir une planche déjà entamée. Cochez « Traits de découpe » pour du papier normal à découper.</p></div>
+    ${list.length ? `<div class="sheets" id="lb-sheets">${pages.map((pg) => `<div class="sheet f${S.lbFmt}${S.lbCut ? ' cut' : ''}">${pg.map(cellHTML).join('')}</div>`).join('')}</div>` : '<div class="paper empty">Aucune étiquette à imprimer.</div>'}`;
+  let lp = $('#lbpage'); if (!lp) { lp = document.createElement('style'); lp.id = 'lbpage'; document.head.appendChild(lp); }
+  lp.textContent = '@page{size:A4 portrait;margin:0}';
+  const fit = () => { const sh = $('#lb-sheets'); if (!sh) return; const w = main.clientWidth; const a4 = 210 * 96 / 25.4; sh.style.zoom = String(Math.min(1, w / a4)); };
+  fit(); window.onresize = fit;
+  $$('#lb-sheets .c2').forEach((el) => { let f = parseFloat(getComputedStyle(el).fontSize); let k = 0; while (el.scrollWidth > el.clientWidth + 0.5 && f > 6 && k++ < 40) { f -= 0.4; el.style.fontSize = f + 'px'; } });
+  const z = $('#lb-zone'); if (z) z.onchange = (ev) => { S.lbZone = ev.target.value; renderEtiquettes(cat, arg); };
+  $$('[data-fmt]').forEach((a) => { a.onclick = (ev) => { ev.preventDefault(); S.lbFmt = a.dataset.fmt; try { localStorage.setItem('reg.lbFmt', S.lbFmt); } catch (_) {} renderEtiquettes(cat, arg); }; });
+  $('#lb-start').onchange = (ev) => { S.lbStart = ev.target.value; renderEtiquettes(cat, arg); };
+  $('#lb-cut').onchange = (ev) => { S.lbCut = ev.target.checked; try { localStorage.setItem('reg.lbCut', S.lbCut ? '1' : '0'); } catch (_) {} renderEtiquettes(cat, arg); };
+  $('#lb-print').onclick = () => {
+    const sh = $('#lb-sheets'); if (!sh) return toast('Aucune étiquette à imprimer.', true);
+    let ps = $('#printsheets'); if (!ps) { ps = document.createElement('div'); ps.id = 'printsheets'; document.body.appendChild(ps); }
+    ps.innerHTML = sh.outerHTML.replace('id="lb-sheets"', '');
+    document.body.classList.add('printing-labels');
+    const done = () => { document.body.classList.remove('printing-labels'); ps.innerHTML = ''; window.removeEventListener('afterprint', done); };
+    window.addEventListener('afterprint', done);
+    window.print();
+  };
+}
+
+// ---------------------------------------------------------------------
+// Sauvegarde (administrateur)
+// ---------------------------------------------------------------------
+function renderSauvegarde() {
+  if (!S.v2) { main.innerHTML = '<div class="notice warn">La sauvegarde nécessite la mise à jour de la base de données (script « mise-a-jour-v2 »).</div>'; return; }
+  const ls = S.params.derniere_sauvegarde;
+  const nFiles = S.pieces.length + S.visites.length;
+  main.innerHTML = `
+    <div class="sectitle"><h2>Sauvegarde</h2></div>
+    <section class="paper box">
+      <div class="sectitle"><h3>Sauvegarde complète</h3></div>
+      <p style="margin:0">Un seul fichier zip avec tout le contenu des trois registres, des BAES et des extincteurs : les tableaux (lisibles dans Excel), les pièces jointes et les signatures. À ranger sur votre ordinateur ou votre OneDrive.</p>
+      <div class="fiche paper" style="border-radius:8px">
+        <div><div class="eyebrow">Dernière sauvegarde</div><div class="val num">${ls ? fr(ls) + (nameOf(S.params.sauvegarde_par) ? ' · ' + esc(nameOf(S.params.sauvegarde_par)) : '') : 'Jamais'}</div></div>
+        <div><div class="eyebrow">Contrôles enregistrés</div><div class="val num">${S.ctl.length}</div></div>
+        <div><div class="eyebrow">Fichiers à sauvegarder</div><div class="val num">${nFiles}</div></div>
+        <div><div class="eyebrow">BAES / extincteurs</div><div class="val num">${S.eq.filter((e) => e.categorie === 'baes').length} / ${S.eq.filter((e) => e.categorie === 'extincteur').length}</div></div></div>
+      <div class="actions"><span class="small muted">Conseil : une sauvegarde par mois. Une alerte vous le rappelle après 30 jours.</span><button type="button" class="primary" id="bk-go">Télécharger la sauvegarde</button></div>
+    </section>
+    <section class="paper box">
+      <div class="sectitle"><h3>Réglages</h3></div>
+      <div class="grid2">
+        <label for="bk-f1">Contrôle mensuel des BAES (tous les … jours)<input type="number" id="bk-f1" min="1" max="365" step="1" value="${S.params.baes_frequence_jours || 30}"></label>
+        <label for="bk-f2">Test d'autonomie des BAES (tous les … jours)<input type="number" id="bk-f2" min="1" max="730" step="1" value="${S.params.autonomie_frequence_jours || 182}"></label>
+        <label for="bk-f3">Contrôle visuel des extincteurs (tous les … jours)<input type="number" id="bk-f3" min="1" max="365" step="1" value="${S.params.extincteur_frequence_jours || 30}"></label></div>
+      <div><button type="button" id="bk-freq-save">Enregistrer</button></div>
+    </section>
+    <section class="paper box">
+      <div class="sectitle"><h3>Sites et secteurs</h3><span class="small muted num">${S.sites.length} site${S.sites.length > 1 ? 's' : ''}</span></div>
+      <p class="small muted" style="margin:0">Pour élargir le registre à d'autres bâtiments. Chaque nouveau site reçoit automatiquement le sommaire A → YZ ; ouvrez ensuite son accès aux responsables dans l'onglet Accès.</p>
+      <div class="tablewrap"><table style="min-width:480px"><thead><tr><th>Site</th><th>Nom court</th><th>Secteur</th><th>Préfixe des codes</th></tr></thead><tbody>
+        ${S.sites.map((x) => `<tr><td><b>${esc(x.nom)}</b></td><td>${esc(x.court)}</td><td>${esc(x.secteur || 'Est')}</td><td class="num">${esc(x.prefixe || '')}</td></tr>`).join('')}</tbody></table></div>
+      ${S.sites.some((x) => 'secteur' in x) ? `<form class="grid2" id="site-f" novalidate>
+        <label for="ns-nom">Nom complet<input id="ns-nom" placeholder="Gymnase des Malteries"></label>
+        <label for="ns-court">Nom court (onglets)<input id="ns-court" placeholder="Gymnase Malteries"></label>
+        <label for="ns-sec">Secteur<input id="ns-sec" list="ns-secs" value="Est"><datalist id="ns-secs">${[...new Set(S.sites.map((x) => x.secteur || 'Est'))].map((v) => `<option value="${esc(v)}">`).join('')}</datalist></label>
+        <label for="ns-pre">Préfixe des codes (3 lettres)<input id="ns-pre" maxlength="4" placeholder="MAL"></label>
+        <label class="chk"><input type="checkbox" id="ns-stade">C'est un stade (ajoute les rubriques T, U, V)</label>
+        <div style="align-self:end"><button type="submit" class="primary" id="ns-go">Créer le site</button></div></form>`
+      : '<div class="notice warn">Pour ajouter des sites, exécutez d\'abord le script « mise-a-jour-v3 » dans Supabase.</div>'}
+    </section>`;
+  $('#bk-go').onclick = (e) => sauvegarde(e.target);
+  const sf = $('#site-f');
+  if (sf) sf.onsubmit = async (e) => {
+    e.preventDefault();
+    const nom = $('#ns-nom').value.trim(), court = $('#ns-court').value.trim() || nom;
+    if (!nom) return toast('Indiquez le nom du site.', true);
+    busy($('#ns-go'), true);
+    const { data, error } = await S.sb.rpc('reg_creer_site', { p_nom: nom, p_court: court, p_prefixe: $('#ns-pre').value.trim(), p_secteur: $('#ns-sec').value.trim(), p_stade: $('#ns-stade').checked });
+    busy($('#ns-go'), false);
+    if (error) return toast(errMsg(error), true);
+    const mine = await S.sb.rpc('reg_mes_sites'); if (mine.data) S.mesSites = mine.data;
+    toast('Site créé'); await reload(); location.hash = '#/site/' + data;
+  };
+  $('#bk-freq-save').onclick = async (e) => {
+    const v = (id) => Math.round(Number($(id).value));
+    const patch = { baes_frequence_jours: v('#bk-f1'), autonomie_frequence_jours: v('#bk-f2'), extincteur_frequence_jours: v('#bk-f3') };
+    if (!(patch.baes_frequence_jours >= 1 && patch.baes_frequence_jours <= 365 && patch.extincteur_frequence_jours >= 1 && patch.extincteur_frequence_jours <= 365 && patch.autonomie_frequence_jours >= 1 && patch.autonomie_frequence_jours <= 730)) return toast('Indiquez des nombres de jours valides.', true);
+    busy(e.target, true);
+    const { error } = await S.sb.from('reg_parametres').update(patch).eq('id', 1);
+    busy(e.target, false);
+    if (error) return toast(errMsg(error), true);
+    Object.assign(S.params, patch); toast('Fréquences enregistrées'); renderTabs(route());
+  };
+}
+async function sauvegarde(btn) {
+  busy(btn, true);
+  try {
+    await loadAll();
+    await loadJSZip();
+    const zip = new JSZip(); const d = today(); const root = 'Sauvegarde registres ' + d;
+    const tables = { sites: S.sites, rubriques: S.rub, controles: S.ctl, observations: S.obs, passages_signes: S.visites, pieces_jointes: S.pieces, equipements: S.eq.map((e) => ({ ...e, site: siteOf(e.site_id)?.nom, etat: eqStatut(e).l })), equipements_controles: S.eqCtlAll.map((c) => { const e = S.eq.find((x) => x.id === c.equipement_id); return { ...c, code: e?.code, categorie: e?.categorie, par: nameOf(c.cree_par) }; }),
+      acces: Object.values(S.people).filter((p) => (p.sites || []).length).map((p) => ({ personne: p.full_name, sites: (p.sites || []).join(', ') })) };
+    zip.file(root + '/LISEZMOI.txt', `Sauvegarde des registres de sécurité – Secteur Est\r\nFaite le ${fr(d)} par ${S.me.full_name}.\r\n\r\n- tableaux/ : un fichier .csv par table, à ouvrir avec Excel.\r\n- sauvegarde-complete.json : toutes les données, pour une restauration.\r\n- fichiers/ : pièces jointes, signatures et photos des équipements, rangées par site.\r\n`);
+    zip.file(root + '/sauvegarde-complete.json', JSON.stringify({ application: 'registres-securite', version: 2, date: new Date().toISOString(), par: S.me.full_name, ...tables }, null, 1));
+    for (const [k, v] of Object.entries(tables)) zip.file(root + '/tableaux/' + k + '.csv', tableCsv(v));
+    const files = [...S.pieces.map((p) => p.chemin), ...S.visites.map((v) => v.signature), ...S.eq.map((e) => e.photo).filter(Boolean), ...S.eqCtlAll.map((c) => c.photo).filter(Boolean)];
+    const fails = [];
+    for (let i = 0; i < files.length; i++) {
+      toast(`Sauvegarde : fichier ${i + 1} sur ${files.length}…`);
+      try { zip.file(root + '/fichiers/' + files[i], await fetchStored(files[i])); } catch (e) { fails.push(files[i]); }
+    }
+    if (fails.length) zip.file(root + '/FICHIERS MANQUANTS.txt', fails.join('\r\n'));
+    toast('Création du fichier zip…');
+    saveBlob(await zip.generateAsync({ type: 'blob' }), cleanName(root) + '.zip');
+    const up = await S.sb.from('reg_parametres').update({ derniere_sauvegarde: new Date().toISOString(), sauvegarde_par: S.me.id }).eq('id', 1).select().maybeSingle();
+    if (up.data) S.params = up.data;
+    toast(fails.length ? `Sauvegarde téléchargée, sauf ${fails.length} fichier(s) introuvable(s).` : 'Sauvegarde téléchargée', !!fails.length);
+    render();
+  } catch (e) { toast(errMsg(e), true); } finally { busy(btn, false); }
+}
+
+
+const ROLE = { secteur: 'Responsable de secteur', responsable: 'Responsable d\'installation', agent: 'Agent d\'entretien' };
+function renderAcces() {
+  const people = Object.values(S.people).filter((p) => p.active).sort((a, b) => (a.role === 'secteur' ? -1 : 0) - (b.role === 'secteur' ? -1 : 0) || a.full_name.localeCompare(b.full_name));
+  const stockSite = (n) => ({ 1: 'Mandela', 2: 'Aar' }[n] || '');
+  main.innerHTML = `
+    <div class="sectitle"><h2>Accès aux registres</h2></div>
+    <div class="notice">Seules les personnes cochées ici entrent dans l'application, et seulement sur les sites cochés. Elles se connectent avec leur compte Stock Entretien. Une personne sans compte le crée d'abord dans Stock Entretien, puis vous validez son compte là-bas avant de cocher ses sites ici.</div>
+    <div class="paper">${people.map((p) => p.role === 'secteur'
+      ? `<div class="person"><div><b>${esc(p.full_name)}</b>${p.id === S.me.id ? ' (vous)' : ''}<div class="small muted">${ROLE.secteur} · administrateur, accès à tous les registres</div></div><span class="pill p-ok">Tous les sites</span></div>`
+      : `<div class="person" data-person="${p.id}"><div style="min-width:0"><b>${esc(p.full_name)}</b><div class="small muted">${esc(ROLE[p.role] || '')}${stockSite(p.stock_site) ? ' · ' + stockSite(p.stock_site) + ' dans Stock Entretien' : ''}</div>
+          <div class="checks">${S.sites.map((s) => `<label><input type="checkbox" value="${s.id}" ${(p.sites || []).includes(s.id) ? 'checked' : ''}>${esc(s.court)}</label>`).join('')}</div></div>
+          <button type="button" data-save="${p.id}">Enregistrer</button></div>`).join('') || '<div class="empty">Aucun compte actif.</div>'}</div>`;
+  $$('[data-save]').forEach((b) => { b.onclick = async () => {
+    const id = b.dataset.save; const row = $(`[data-person="${id}"]`);
+    const sites = $$('input:checked', row).map((i) => i.value);
+    busy(b, true);
+    const { error } = sites.length ? await S.sb.from('reg_acces').upsert({ user_id: id, sites }) : await S.sb.from('reg_acces').delete().eq('user_id', id);
+    busy(b, false);
+    if (error) return toast(errMsg(error), true);
+    S.people[id].sites = sites; toast(sites.length ? 'Accès enregistré' : 'Accès retiré');
+  }; });
+}
+
+// ---------------------------------------------------------------------
+// Connexion
+// ---------------------------------------------------------------------
+function authShell(html) { $('#band').hidden = true; main.innerHTML = `<div class="auth"><div style="text-align:center"><div class="seal" style="margin:0 auto 10px;border-color:var(--navy);color:var(--navy)" aria-hidden="true">ERP</div><span class="eyebrow">Secteur Est</span><h2 style="font-size:1.5rem;font-weight:800">Registres de sécurité</h2></div>${html}</div>`; }
+function renderLogin() {
+  authShell(`<form class="paper" id="lf" novalidate>
+      <label for="l-email">Adresse e-mail<input type="email" id="l-email" autocomplete="email" inputmode="email" autocapitalize="none" required></label>
+      <label for="l-pw">Mot de passe<input type="password" id="l-pw" autocomplete="current-password" required></label>
+      <button type="submit" class="primary" id="l-go">Se connecter</button>
+      <p class="small muted" style="margin:0">Utilisez le même compte que pour Stock Entretien. Pas encore de compte ou mot de passe oublié : <a href="${esc(CFG.stockUrl)}">ouvrir Stock Entretien</a>.</p>
+    </form>`);
+  $('#lf').onsubmit = async (e) => {
+    e.preventDefault();
+    const email = $('#l-email').value.trim(), pw = $('#l-pw').value;
+    if (!/^\S+@\S+\.\S+$/.test(email) || !pw) return toast('Saisissez votre adresse e-mail et votre mot de passe.', true);
+    busy($('#l-go'), true);
+    const { error } = await S.sb.auth.signInWithPassword({ email, password: pw });
+    busy($('#l-go'), false);
+    if (error) return toast(errMsg(error), true);
+    afterLogin();
+  };
+}
+function renderNoAccess(title, text) {
+  authShell(`<div class="paper"><h3>${title}</h3><p style="margin:0">${text}</p>
+    <button type="button" class="primary" id="na-retry">Vérifier à nouveau</button><button type="button" id="na-out">Se déconnecter</button></div>`);
+  $('#na-retry').onclick = () => afterLogin();
+  $('#na-out').onclick = async () => { await S.sb.auth.signOut(); renderLogin(); };
+}
+async function afterLogin() {
+  const { data: { user } } = await S.sb.auth.getUser();
+  if (!user) return renderLogin();
+  main.innerHTML = '<div class="loading">Chargement des registres…</div>';
+  const [prof, mine, adm] = await Promise.all([
+    S.sb.from('profiles').select('id, full_name, role, active').eq('id', user.id).maybeSingle(),
+    S.sb.rpc('reg_mes_sites'), S.sb.rpc('reg_is_admin')]);
+  if (mine.error && /reg_mes_sites|function/i.test(mine.error.message || '')) return renderNoAccess('Base à préparer', 'La base de données des registres n\'est pas encore installée. Exécutez le script SQL fourni dans Supabase.');
+  if (prof.error || mine.error) return renderNoAccess('Connexion impossible', esc(errMsg(prof.error || mine.error)));
+  const me = prof.data;
+  if (!me || !me.active) return renderNoAccess('Compte en attente', 'Votre compte Stock Entretien n\'est pas encore validé par le responsable de secteur.');
+  S.me = me; S.admin = !!adm.data; S.mesSites = mine.data || [];
+  if (!S.mesSites.length) { S.me = null; return renderNoAccess('Accès non autorisé', 'Votre compte n\'a pas encore accès aux registres de sécurité. Demandez au responsable de secteur de vous l\'ouvrir.'); }
+  $('#who-name').textContent = me.full_name + (S.admin ? ' · administrateur' : '');
+  $('#band').hidden = false;
+  try { await loadAll(); } catch (e) { return renderNoAccess('Chargement impossible', esc(errMsg(e))); }
+  render();
+}
+document.addEventListener('click', (e) => { const b = e.target.closest('[data-dl]'); if (b) { e.preventDefault(); downloadPath(b.dataset.dl, b.dataset.name); } });
+$('#logout').onclick = async () => { await S.sb.auth.signOut(); S.me = null; renderLogin(); };
+
+async function boot() {
+  if (!window.supabase) { authShell('<div class="notice bad">Impossible de charger l\'application. Vérifiez la connexion Internet, puis rechargez la page.</div>'); return; }
+  S.sb = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false } });
+  const { data: { session } } = await S.sb.auth.getSession();
+  if (!session) return renderLogin();
+  afterLogin();
+}
+boot();
+})();
+</script>
+</body>
+</html>
