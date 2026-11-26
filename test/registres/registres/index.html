@@ -4198,6 +4198,44 @@ function renderAcces() {
     if (error) return toast(errMsg(error), true);
     S.people[id].sites = sites; toast(sites.length ? 'Accès enregistré' : 'Accès retiré');
   }; });
+  remplacements(people);
+}
+
+// Remplacements temporaires : un responsable couvre le site d'un collègue absent, jusqu'à une date de fin
+async function remplacements(people) {
+  const box = document.createElement('section'); box.className = 'paper box'; box.style.marginTop = '16px'; main.appendChild(box);
+  const iso = (d) => d.toISOString().slice(0, 10), auj = iso(new Date()), sem = iso(new Date(Date.now() + 7 * 864e5));
+  const draw = async () => {
+    const { data, error } = await S.sb.from('reg_remplacements').select('*').order('du', { ascending: true });
+    if (error) { box.innerHTML = '<div class="sectitle"><h3>Remplacements temporaires</h3></div><p class="small muted" style="margin:0">Lancez d\'abord la mise à jour 6 dans Supabase.</p>'; return; }
+    const L = (data || []).filter((r) => r.au >= auj);
+    const cand = people.filter((p) => p.role !== 'secteur');
+    const siteNom = (id) => (S.sites.find((x) => x.id === id) || {}).court || id;
+    box.innerHTML = `<div class="sectitle"><h3>Remplacements temporaires</h3></div>
+      <p class="small muted" style="margin:0 0 10px">Un responsable est absent ? Donnez à un collègue l'accès à son site, pour faire les contrôles à sa place. L'accès s'arrête tout seul à la date de fin ; les droits habituels ne changent pas.</p>
+      ${L.length ? L.map((r) => `<div class="person"><div style="min-width:0"><b>${esc(nameOf(r.user_id) || '—')}</b> couvre <b>${esc(siteNom(r.site_id))}</b><div class="small muted">du ${fr(r.du)} au ${fr(r.au)} inclus</div></div><button type="button" data-rmrempl="${r.id}">Arrêter</button></div>`).join('') : '<p class="small" style="margin:0">Aucun remplacement en cours.</p>'}
+      <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-top:14px">
+        <label class="small" style="display:grid;gap:4px;flex:1 1 160px">Remplaçant<select id="rp-user"><option value="">Choisir…</option>${cand.map((p) => `<option value="${p.id}">${esc(p.full_name)}</option>`).join('')}</select></label>
+        <label class="small" style="display:grid;gap:4px;flex:1 1 140px">Site à couvrir<select id="rp-site">${S.sites.map((x) => `<option value="${x.id}">${esc(x.court)}</option>`).join('')}</select></label>
+        <label class="small" style="display:grid;gap:4px">Du<input type="date" id="rp-du" value="${auj}"></label>
+        <label class="small" style="display:grid;gap:4px">Au (inclus)<input type="date" id="rp-au" value="${sem}"></label>
+        <button type="button" class="primary" id="rp-add">Ajouter</button></div>`;
+    $('#rp-add').onclick = async (ev) => {
+      const user_id = $('#rp-user').value, site_id = $('#rp-site').value, du = $('#rp-du').value, au = $('#rp-au').value;
+      if (!user_id) return toast('Choisissez le remplaçant.', true);
+      if (!du || !au || au < du) return toast('Vérifiez les dates.', true);
+      if ((S.people[user_id]?.sites || []).includes(site_id)) return toast('Cette personne a déjà accès à ce site.', true);
+      busy(ev.currentTarget, true);
+      const { error: e2 } = await S.sb.from('reg_remplacements').insert({ user_id, site_id, du, au });
+      if (e2) { busy(ev.currentTarget, false); return toast(errMsg(e2), true); }
+      toast(`${nameOf(user_id)} couvre ${siteNom(site_id)} jusqu'au ${fr(au)}`); draw();
+    };
+    $$('[data-rmrempl]', box).forEach((b) => { b.onclick = async () => {
+      busy(b, true); const { error: e3 } = await S.sb.from('reg_remplacements').delete().eq('id', b.dataset.rmrempl);
+      if (e3) { busy(b, false); return toast(errMsg(e3), true); } toast('Remplacement arrêté'); draw();
+    }; });
+  };
+  draw();
 }
 
 // ---------------------------------------------------------------------

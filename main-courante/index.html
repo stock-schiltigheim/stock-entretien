@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="fr">
 <head>
-<meta name="mc-version" content="9ba6cf611102">
+<meta name="mc-version" content="77f3d1b1ebba">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#ffffff">
@@ -1097,6 +1097,8 @@ html,body{background:radial-gradient(120% 70% at 70% 12%,#ffffff 0%,#f6f3ee 45%,
 .plsectb{display:grid;gap:2px;padding:10px 12px;border:1px solid #cfe3de;background:#eef5f3;border-radius:4px;color:#0B5A50}.plsect{color:#0B5A50}
 .pldelb{min-height:34px!important;width:34px;padding:0!important;display:grid!important;place-items:center;border:1px solid #f3c4ca!important;background:#fff!important;color:#b81f33!important;border-radius:4px!important}.pldelb svg{width:16px;height:16px}
 .lxz{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 16px;border-left:6px solid var(--zc);background:#fbfaf8;border-bottom:1px solid #e7e1d7}.lxz>div{display:grid;gap:2px}.lxz b{font-size:1.1rem}.lxz small{color:var(--muted)}
+.confie-b{display:grid;gap:2px;padding:10px 12px;border-radius:12px;background:#eef1f8;border-left:4px solid #45609e;color:#34497e}.confie-b span{font-size:.88rem;color:#4b5568}
+.confie-s{background:#f8f9fc;border:1px dashed #c9d0e2;border-radius:14px;padding:12px}.tag.confie-t{background:#eef1f8;color:#34497e;font-weight:700}
 .plmob{display:none}.plm{margin:0!important;justify-items:stretch!important;justify-content:stretch!important;align-items:start!important;box-shadow:none!important;min-height:0!important;display:grid!important;width:100%!important;gap:3px;width:100%;text-align:left;padding:12px 14px;border:0;border-bottom:1px solid #e7e1d7;background:none;font:inherit;color:inherit;border-radius:0}.plm:last-child{border-bottom:0}
 .plmt{display:flex;justify-content:space-between;gap:8px}.plm small{color:var(--muted)}.plm .plme{color:#0B5A50;font-weight:600}.plmj{font-size:.8rem;font-weight:700;color:#3f4654}
 @media (max-width:640px){.plsemw{display:none}.plmob{display:block}}
@@ -1923,7 +1925,7 @@ const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth
 const fr=s=>{if(!s)return '—';const [y,m,d]=String(s).slice(0,10).split('-');return d+'/'+m+'/'+y};
 const days=s=>Math.round((new Date(String(s).slice(0,10)+'T12:00')-new Date(today()+'T12:00'))/864e5);
 const addDays=(s,n)=>{const d=new Date(s+'T12:00');d.setDate(d.getDate()+n);return d.toISOString().slice(0,10)};
-const siteOf=id=>SITES.find(s=>s.id===id)||SITES[0];
+const siteOf=id=>SITES.find(s=>s.id===id)||(typeof SITES_TOUS!=='undefined'&&SITES_TOUS.find(s=>s.id===id))||SITES[0];
 const domOf=id=>DOM.find(d=>d.id===id)||DOM[6];
 const dtOf=id=>DTYPES.find(t=>t.id===id)||DTYPES[0];
 const label=(arr,k)=>(arr.find(a=>String(a[0])===String(k))||[k,k])[1];
@@ -2382,7 +2384,7 @@ function camEquiper(){document.querySelectorAll('label input[type=file][accept="
 function closeOverlay(){secuStop();if(S.drawer?.kind==='secu')S.secuRonde=false;S.drawer=null;$('overlay').innerHTML=''}
 
 /* ============ cartes d'intervention ============ */
-function itemHTML(i){const q={ctm:'CTM (ATAL)',prestataire:'Entreprise',controle:'Contrôle obligatoire'}[i.qui];const h=exTag(i,itemHTML0(i));return q?h.replace('<span class="tags">','<span class="tags"><span class="tag quitag">'+q+'</span>'):h}
+function itemHTML(i){const q={ctm:'CTM (ATAL)',prestataire:'Entreprise',controle:'Contrôle obligatoire'}[i.qui];let h=exTag(i,itemHTML0(i));if(Array.isArray(i.confie)&&i.confie.length)h=h.replace('<span class="tags">','<span class="tags"><span class="tag confie-t">Confié</span>');return q?h.replace('<span class="tags">','<span class="tags"><span class="tag quitag">'+q+'</span>'):h}
 function itemHTML0(i){
   const d=domOf(i.domaine),x=siteOf(i.site),late=isLate(i);const ph=(i.photos||[]);const av=ph.find(p=>p.phase==='apres')||ph[0];
   const when=i.statut==='terminee'?`Terminé le ${fr(i.termineLe)}`:(late?`En retard de ${-days(i.echeance)} j`:(i.echeance?`Pour le ${fr(i.echeance)}`:''));
@@ -3072,6 +3074,7 @@ function openBT(id){
   const body=`
     <div class="tags">${i.priorite==='urgente'?'<span class="tag urg">Urgent</span>':''}<span class="tag">${esc(d.nom)}</span><span class="tag">${esc(x.court)}</span>${i.lieu?`<span class="tag">${esc(i.lieu)}</span>`:''}${plRefTag(i.site,(i.lieu||'')+' '+(i.titre||''))}<span class="tag num ${isLate(i)?'late':''}">${i.statut==='terminee'?'Terminé le '+fr(i.termineLe):'Pour le '+fr(i.echeance)}</span></div>
     ${i.description?`<p style="margin:0">${esc(i.description)}</p>`:''}
+    ${btConfieHTML(i)}
     <section class="sec" style="gap:8px"><h4>Où en est-on ?</h4><div class="statebar" id="statebar">${stateBtns(i,ro)}</div></section>
     <section class="sec" style="gap:8px"><h4>Photos avant et après</h4><div class="photos" id="photos">${photosHTML(i)}</div></section>
     ${S.sup?`<section class="atalbox ${i.atal?'ok':''}" id="atalbox"><h4 style="color:inherit">Fiche ATAL</h4>
@@ -3082,7 +3085,7 @@ function openBT(id){
     ${ro?'':`<details class="more"><summary>Modifier les informations</summary><div class="in"><div class="grid2">
       <label class="f full">Intitulé<input id="f-titre" name="titre" value="${esc(i.titre||'')}"></label>
       <label class="f">Métier<select id="f-domaine" name="domaine">${opt(DOM.map(m=>[m.id,m.nom]),i.domaine)}</select></label>
-      <label class="f">Site<select id="f-site" name="site">${opt(SITES.map(s=>[s.id,s.nom]),i.site)}</select></label>
+      <label class="f">Site<select id="f-site" name="site">${opt((SITES.some(s=>s.id===i.site)?SITES:[...SITES,siteOf(i.site)]).map(s=>[s.id,s.nom]),i.site)}</select></label>
       <label class="f full">Lieu précis<input id="f-lieu" name="lieu" value="${esc(i.lieu||'')}"></label>
       <label class="f">Priorité<select id="f-priorite" name="priorite">${opt(PRIO,i.priorite)}</select></label>
       <label class="f">Échéance<input type="date" id="f-echeance" name="echeance" value="${esc(i.echeance||'')}"></label>
@@ -4002,6 +4005,21 @@ async function lxSave(){const f=$('lxform');if(!f||S.busy)return;const v=id=>($(
   let row;if(t==='zone'){id=id||uniq(lxSlug(v('lx-nom')),Z);row={id,nom:v('lx-nom'),nom_long:v('lx-long')||v('lx-nom'),description:v('lx-desc'),resp_titre:v('lx-titre'),couleur:v('lx-coul')||'#2f5fa7',ordre:Number(v('lx-ordre'))||100,actif:$('lx-actif')?$('lx-actif').checked:true,maj_le:new Date().toISOString()}}
   else{if(!v('lx-court')){toast('Indiquez le nom court.');return}id=id||uniq(lxSlug(v('lx-court')),L);row={id,nom:v('lx-nom'),court:v('lx-court'),ini:(v('lx-ini')||v('lx-court').split(/\s+/).filter(w=>w.length>2).map(w=>w[0]).join('').slice(0,2)).toUpperCase()||null,zone:v('lx-zone'),ordre:Number(v('lx-ordre'))||100,actif:$('lx-actif')?$('lx-actif').checked:true,maj_le:new Date().toISOString()}}
   S.busy=true;try{await window.mcLieuxEcrire(t==='zone'?'mc_zones':'mc_lieux',row);const D=await window.mcLieux();lieuxAppliquer(D);S.busy=false;S.lxEdit=null;toast('Enregistré');render()}catch(e){S.busy=false;toast(errMsg(e))}}
+const cfNom=u=>((S.comptes||[]).find(c=>c.id===u)||{}).full_name||who(u);
+function btConfieHTML(i){const L=Array.isArray(i.confie)?i.confie:[];const adm=!!window.mcMoi?.()?.admin;let h='';
+  if(L.length&&!adm)h+=`<div class="confie-b"><b>Bon confié par le responsable de secteur</b><span>Site d'origine : ${esc(siteOf(i.site).court)}. Vous pouvez le traiter et le clôturer.</span></div>`;
+  if(adm&&isOpen(i)){const R=(S.comptes||[]).filter(c=>c.acces&&c.active!==false&&c.role!=='secteur'&&c.profil!=='agent');
+    h+=`<section class="sec confie-s" style="gap:8px"><h4>Confier ce bon</h4>${L.length
+      ?`<p class="small" style="margin:0">Confié à <b>${esc(L.map(cfNom).join(', '))}</b>${i.confieLe?' depuis le '+fr(i.confieLe):''}. Il le voit et peut le traiter.</p><div><button type="button" data-reprendre="${esc(i.id)}">Reprendre le bon</button></div>`
+      :`<p class="small muted" style="margin:0">Responsable absent ? Confiez ce bon à un collègue : il le verra et pourra le traiter, sans accès au reste du site. Le bon reste au ${esc(siteOf(i.site).court)}.</p>
+      <div class="addrow"><select id="f-confie" aria-label="Responsable à qui confier le bon">${S.comptes?'<option value="">Choisir un responsable…</option>'+R.map(c=>`<option value="${esc(c.id)}">${esc(c.full_name)}</option>`).join(''):'<option value="">Chargement…</option>'}</select><button type="button" class="primary" data-confier="${esc(i.id)}">Confier</button></div>`}</section>`;
+    if(!S.comptes&&window.mcComptes&&!S.cfLoad){S.cfLoad=1;window.mcComptes().then(r=>{S.comptes=r;S.cfLoad=0;if(S.drawer?.kind==='bt'&&S.drawer.id===i.id)openBT(i.id)}).catch(()=>{S.cfLoad=0})}}
+  return h}
+async function btConfier(id){const i=S.interv.find(x=>x.id===id);const u=($('f-confie')||{}).value;if(!i)return;if(!u){toast('Choisissez un responsable.');return}
+  const nom=cfNom(u),t=new Date().toISOString(),j=[...(i.journal||[]),{le:t,par:S.myId,txt:'Bon confié à '+nom}];
+  try{await S.db.collection('interventions').doc(id).update({confie:[u],confieLe:t,confiePar:S.myId,journal:j,majLe:t,majPar:S.myId});Object.assign(i,{confie:[u],confieLe:t,journal:j});toast('Bon confié à '+nom);openBT(id)}catch(e){toast(errMsg(e))}}
+async function btReprendre(id){const i=S.interv.find(x=>x.id===id);if(!i)return;const t=new Date().toISOString(),j=[...(i.journal||[]),{le:t,par:S.myId,txt:'Bon repris par le responsable de secteur'}];
+  try{await S.db.collection('interventions').doc(id).update({confie:[],journal:j,majLe:t,majPar:S.myId});Object.assign(i,{confie:[],journal:j});toast('Bon repris');openBT(id)}catch(e){toast(errMsg(e))}}
 function plJourneeHTML(){if(!plVoit())return '';const iso=today();const B=PL_SITES.map(x=>({x,L:plDuJour(x.id,iso)})).filter(b=>b.L.length);if(!B.length)return '';
   return `<section class="ep-b"><h3>Équipes aujourd'hui</h3>${B.map(({x,L})=>`<a class="ep-l" href="./?seul=planning#planning" style="text-decoration:none;color:inherit"><span class="ep-ic">${ic('users')}</span><span class="ep-tx"><b>${esc(x.court)} : ${L.length} présent${L.length>1?'s':''}</b><small>${L.map(({p,c})=>esc((p.nom||'?').split(' ')[0])+' '+plH(c.debut)+'–'+plH(c.fin)).join(' · ')}</small></span>${ic('chev')}</a>`).join('')}</section>`}
 function renderRessources(){const ok=v=>VIEWS.includes(v)&&!ecranCache(v)&&navItems().some(x=>x.v===v);
@@ -5700,6 +5718,8 @@ document.addEventListener('click',e=>{
   if(ds.plsite){S.plSite=ds.plsite;S.plEdit=null;S.plEspEdit=false;S.plAgent=null;render();return}
   if(ds.plpdf){plPdf(ds.plpdf);return}
   if(ds.pltab){plPdfTableau(ds.pltab);return}
+  if(ds.confier){btConfier(ds.confier);return}
+  if(ds.reprendre){btReprendre(ds.reprendre);return}
   if(ds.lxedit){S.lxEdit=ds.lxedit;render();window.scrollTo(0,0);return}
   if(ds.lxannuler){S.lxEdit=null;render();return}
   if(ds.lxsave){lxSave();return}
