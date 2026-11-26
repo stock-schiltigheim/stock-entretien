@@ -316,7 +316,7 @@ html,body{background:radial-gradient(120% 70% at 70% 12%,#ffffff 0%,#f6f3ee 45%,
 .apps-big b,.outils b{color:var(--tf)!important}
 .apps-big small,.outils small{color:#3f4654!important}
 .apps-big .go{background:#fff!important;color:var(--tf)!important}
-body .apps-big .ic.ic-app{width:62px!important;height:62px!important;border-radius:18px!important;border:0!important;background:linear-gradient(150deg,#6d84bd,#425a93)!important;box-shadow:0 8px 18px rgba(58,79,133,.20),inset 0 1px 0 rgba(255,255,255,.35)!important}
+body .apps-big .ic.ic-app{width:62px!important;height:62px!important;border-radius:18px!important;border:0!important;background:linear-gradient(150deg,var(--b1),var(--b2))!important;box-shadow:0 8px 18px rgba(52,73,126,.20),inset 0 1px 0 rgba(255,255,255,.35)!important}
 body .apps-big .ic.ic-app svg{stroke:#fff!important;width:32px!important;height:32px!important}
 .apps-big a{border-left:4px solid #E73446!important;border-color:#e6e8ef!important;border-left-color:#E73446!important}.apps-big a::before{background-image:radial-gradient(rgba(58,79,133,.10) 1.3px,transparent 1.6px)!important}.apps-big .go{background:#fff!important;color:#34497e!important;border:1.5px solid #d5d9e6;box-shadow:none!important}.apps-big b{font-family:'Raleway',var(--display);font-weight:800;letter-spacing:.005em}.apps-big small{color:#5f5a5b!important}
 .outils-t{position:relative;display:flex;align-items:center;gap:10px;margin:22px 2px 10px;font-size:.74rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#5e6676}
@@ -505,7 +505,7 @@ function orbite(counts) {
   if ($('#orbite')) $('#orbite').innerHTML = `<div class="orbite" style="--od:-${t % 90000}ms;--pd:-${t % 9000}ms;--ld:-${t % 16000}ms"><span class="plateau" aria-hidden="true"></span><span class="anneau" aria-hidden="true"></span><span class="orbin" aria-hidden="true"></span>
     <span class="lunes" aria-hidden="true"><i></i><i></i></span><span class="lunes2" aria-hidden="true"><i></i></span>
     <div class="centre"><img src="${LOGO}" alt="Ville de Schiltigheim"><span class="se">SECTEUR EST</span><span class="rs">Vos applications</span></div><div class="orb">${B}</div></div>`;  const SUB = { stock: 'Commander, valider, stock, inventaire', mc: 'Signaler, trier, intervenir, clôturer', reg: 'Scanner, échéances, registre de sécurité' };
-  $('#apps-big').innerHTML = ['mc', 'reg', 'stock'].map((id) => APPS.find((x) => x.id === id)).map((a) => { const nb = counts ? counts[a.id] || 0 : 0; const P = ['#ffffff', '#34497e']; return `<a href="${a.url}" style="--tb:${P[0]};--tf:${P[1]}"><span class="ic ic-app">${a.i}</span><span><b>${esc(a.t)}${nb ? `<span class="nb">${nb > 99 ? '99+' : nb}</span>` : ''}</b><small>${SUB[a.id] || ''}</small></span><span class="go" aria-hidden="true">›</span></a>`; }).join('');
+  $('#apps-big').innerHTML = ['mc', 'reg', 'stock'].map((id) => APPS.find((x) => x.id === id)).map((a) => { const nb = counts ? counts[a.id] || 0 : 0; const P = { mc: ['#ffffff', '#2f4275', '#5a6fa8', '#2f4275'], reg: ['#ffffff', '#3c5590', '#6d8bc8', '#45609e'], stock: ['#ffffff', '#3f6aa8', '#8db3e4', '#5584c6'] }[a.id]; return `<a href="${a.url}" style="--tb:${P[0]};--tf:${P[1]};--b1:${P[2]};--b2:${P[3]}"><span class="ic ic-app">${a.i}</span><span><b>${esc(a.t)}${nb ? `<span class="nb">${nb > 99 ? '99+' : nb}</span>` : ''}</b><small>${SUB[a.id] || ''}</small></span><span class="go" aria-hidden="true">›</span></a>`; }).join('');
 }
 orbite(null);
 // Ivoire 3D : le plateau suit le téléphone (ou la souris), pause quand on touche
