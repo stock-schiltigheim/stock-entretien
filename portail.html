@@ -318,6 +318,7 @@ html,body{background:radial-gradient(120% 70% at 70% 12%,#ffffff 0%,#f6f3ee 45%,
 .apps-big .go{background:#fff!important;color:var(--tf)!important}
 body .apps-big .ic.ic-app{width:62px!important;height:62px!important;border-radius:18px!important;border:0!important;background:linear-gradient(150deg,var(--b1),var(--b2))!important;box-shadow:0 8px 18px rgba(52,73,126,.20),inset 0 1px 0 rgba(255,255,255,.35)!important}
 body .apps-big .ic.ic-app svg{stroke:#fff!important;width:32px!important;height:32px!important}
+.outils a{--tb:#ffffff!important;--tf:#34497e!important;border-color:#e3e6ee!important;border-left:4px solid #E73446!important}.outils a::before{background-image:radial-gradient(rgba(58,79,133,.10) 1.3px,transparent 1.6px)!important}.outils .ic{background:linear-gradient(150deg,#8b9dc9,#5a6fa8)!important;border:0!important;border-radius:14px!important}.outils .ic svg{stroke:#fff!important}.outils b{font-family:'Raleway',system-ui,sans-serif;font-weight:800}.outils small{color:#5b6274!important}
 .apps-big a{border-left:4px solid #E73446!important;border-color:#e6e8ef!important;border-left-color:#E73446!important}.apps-big a::before{background-image:radial-gradient(rgba(58,79,133,.10) 1.3px,transparent 1.6px)!important}.apps-big .go{background:#fff!important;color:#34497e!important;border:1.5px solid #d5d9e6;box-shadow:none!important}.apps-big b{font-family:'Raleway',var(--display);font-weight:800;letter-spacing:.005em}.apps-big small{color:#5f5a5b!important}
 .outils-t{position:relative;display:flex;align-items:center;gap:10px;margin:22px 2px 10px;font-size:.74rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#5e6676}
 .outils-t::after{content:"";flex:1;height:1px;background:#e2ddd4}
@@ -327,7 +328,7 @@ body .apps-big .ic.ic-app svg{stroke:#fff!important;width:32px!important;height:
 .outils b{font-size:1.08rem;line-height:1.15}.outils small{font-size:.86rem;line-height:1.25}
 .outils a:active,.apps-big a:active{transform:scale(.98)}
 .hello::after{content:"Choisissez votre application"}
-.outils a[hidden]{display:none!important}#outil-rh{grid-column:1/-1}
+.outils a[hidden]{display:none!important}#outil-rh{grid-column:auto}
 /* ===== Présence du jour ===== */
 .pres{margin:22px 0 6px;position:relative}
 .pr-t{margin:0 0 10px;font-size:.78rem;text-transform:uppercase;letter-spacing:.14em;font-weight:800;color:#5d5852;display:flex;align-items:center;gap:10px}
@@ -393,7 +394,8 @@ body .apps-big .ic.ic-app svg{stroke:#fff!important;width:32px!important;height:
   <nav class="outils" aria-label="Outils du secteur">
     <a href="main-courante/?seul=agenda#agenda" style="--tb:#E2BEA8;--tf:#8C4214"><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4M8 14h3M8 17h6"/></svg></span><b>Agenda</b><small>Interventions, manifestations, Outlook</small></a>
     <a href="main-courante/?seul=cles#cles" style="--tb:#C6B8E1;--tf:#533689"><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3M15 8l2 2"/></svg></span><b>Clés et badges</b><small>Remises, reprises, listings</small></a>
-    <a href="main-courante/?seul=planning#planning" id="outil-rh" hidden style="--tb:#cdd3dc;--tf:#2f3a4a"><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19.5c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5"/><rect x="14.5" y="10.5" width="6.5" height="8" rx="1.2"/><path d="M16.3 13.2h3M16.3 15.8h3"/></svg></span><b>RH · Équipes</b><small>Fiches de poste, horaires, espaces · réservé aux responsables</small></a>
+    <a href="main-courante/?seul=planning#planning" id="outil-rh" hidden style="--tb:#cdd3dc;--tf:#2f3a4a"><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19.5c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5"/><rect x="14.5" y="10.5" width="6.5" height="8" rx="1.2"/><path d="M16.3 13.2h3M16.3 15.8h3"/></svg></span><b>RH · Équipes</b><small>Fiches de poste, horaires, espaces</small></a>
+    <a href="tableau-de-bord.html" id="outil-tb" hidden style="--tb:#cdd3dc;--tf:#2f3a4a"><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><b>Tableau de bord</b><small>Les chiffres du secteur, prêts à imprimer</small></a>
   </nav>
   <section class="pres" id="pres" hidden aria-label="Présence du jour"></section>
   <div id="msg"></div>
@@ -532,7 +534,7 @@ async function start() {
   const uid = session.user.id;
   drawPush(sb, uid);
   const prof = await sb.from('profiles').select('full_name').eq('id', uid).maybeSingle();
-  try { const m = await sb.rpc('mc_moi'); const d = m.data; if (d && d.actif !== false && (d.admin || d.profil === 'secteur' || d.profil === 'responsable')) { const rh = document.getElementById('outil-rh'); if (rh) rh.hidden = false; prDemarrer(sb, uid); } } catch (e) { /* pas d'accès */ }
+  try { const m = await sb.rpc('mc_moi'); const d = m.data; if (d && d.actif !== false && (d.admin || d.profil === 'secteur' || d.profil === 'responsable')) { const rh = document.getElementById('outil-rh'); if (rh) rh.hidden = false; const tb = document.getElementById('outil-tb'); if (tb) tb.hidden = false; prDemarrer(sb, uid); } } catch (e) { /* pas d'accès */ }
   const nom = (prof.data && prof.data.full_name) || session.user.email || '';
   $('#bonjour').textContent = `${new Date().getHours() < 18 ? 'Bonjour' : 'Bonsoir'}${nom.split(/\s+/)[0] ? ', ' + nom.split(/\s+/)[0] : ''}`;
   $('#who').innerHTML = `${esc(nom)}<br><button type="button" id="out">Se déconnecter</button>`;
