@@ -1,0 +1,24 @@
+{
+  "id": "test-portail-secteur-est",
+  "name": "TEST · Portail de proximité du Secteur Est – Ville de Schiltigheim",
+  "short_name": "TEST Secteur Est",
+  "description": "Stock entretien, maintenance technique et registres de sécurité du Secteur Est.",
+  "lang": "fr",
+  "start_url": "portail.html",
+  "scope": "./portail",
+  "display": "standalone",
+  "background_color": "#f6f2f2",
+  "theme_color": "#e83447",
+  "icons": [
+    {
+      "src": "portail-192.png?v=2",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "portail-512.png?v=2",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

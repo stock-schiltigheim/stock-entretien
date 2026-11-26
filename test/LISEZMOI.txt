@@ -1,0 +1,2 @@
+Version de test, fabriquée automatiquement. Ne pas modifier à la main.
+Base : projet Supabase de test (données fictives).
