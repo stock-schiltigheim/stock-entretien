@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="fr">
 <head>
-<meta name="mc-version" content="77f3d1b1ebba">
+<meta name="mc-version" content="711328f054b3">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#ffffff">
@@ -1099,6 +1099,10 @@ html,body{background:radial-gradient(120% 70% at 70% 12%,#ffffff 0%,#f6f3ee 45%,
 .lxz{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 16px;border-left:6px solid var(--zc);background:#fbfaf8;border-bottom:1px solid #e7e1d7}.lxz>div{display:grid;gap:2px}.lxz b{font-size:1.1rem}.lxz small{color:var(--muted)}
 .confie-b{display:grid;gap:2px;padding:10px 12px;border-radius:12px;background:#eef1f8;border-left:4px solid #45609e;color:#34497e}.confie-b span{font-size:.88rem;color:#4b5568}
 .confie-s{background:#f8f9fc;border:1px dashed #c9d0e2;border-radius:14px;padding:12px}.tag.confie-t{background:#eef1f8;color:#34497e;font-weight:700}
+.omph{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}.omph figure{position:relative;margin:0;display:grid;gap:4px}
+.omph .thumb{width:100%;aspect-ratio:4/3;padding:0;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:#f4f5f8}.omph .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.omph figcaption{font-size:.8rem;color:var(--muted);line-height:1.25}.omph .x{position:absolute;top:6px;right:6px;width:28px;height:28px;border-radius:50%;padding:0;background:rgba(255,255,255,.92)}
+.omadd{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}.omadd input[type=text],.omadd #om-leg{flex:1 1 200px;min-width:0}
 .plmob{display:none}.plm{margin:0!important;justify-items:stretch!important;justify-content:stretch!important;align-items:start!important;box-shadow:none!important;min-height:0!important;display:grid!important;width:100%!important;gap:3px;width:100%;text-align:left;padding:12px 14px;border:0;border-bottom:1px solid #e7e1d7;background:none;font:inherit;color:inherit;border-radius:0}.plm:last-child{border-bottom:0}
 .plmt{display:flex;justify-content:space-between;gap:8px}.plm small{color:var(--muted)}.plm .plme{color:#0B5A50;font-weight:600}.plmj{font-size:.8rem;font-weight:700;color:#3f4654}
 @media (max-width:640px){.plsemw{display:none}.plmob{display:block}}
@@ -4020,6 +4024,26 @@ async function btConfier(id){const i=S.interv.find(x=>x.id===id);const u=($('f-c
   try{await S.db.collection('interventions').doc(id).update({confie:[u],confieLe:t,confiePar:S.myId,journal:j,majLe:t,majPar:S.myId});Object.assign(i,{confie:[u],confieLe:t,journal:j});toast('Bon confié à '+nom);openBT(id)}catch(e){toast(errMsg(e))}}
 async function btReprendre(id){const i=S.interv.find(x=>x.id===id);if(!i)return;const t=new Date().toISOString(),j=[...(i.journal||[]),{le:t,par:S.myId,txt:'Bon repris par le responsable de secteur'}];
   try{await S.db.collection('interventions').doc(id).update({confie:[],journal:j,majLe:t,majPar:S.myId});Object.assign(i,{confie:[],journal:j});toast('Bon repris');openBT(id)}catch(e){toast(errMsg(e))}}
+function omPhotosHTML(m){const ph=m.photos||[];const up=S.canWrite;
+  return `${ph.length?`<div class="omph">${ph.map((p,k)=>`<figure><button type="button" class="thumb" data-omzoom="${k}" aria-label="Agrandir">${pimg(p,`alt="${esc(p.legende||'Photo jointe')}" loading="lazy"`)}</button><figcaption>${esc(p.legende||'')}</figcaption>${up&&(S.sup||p.par===S.myId)?`<button type="button" class="x" data-omrmphoto="${k}" aria-label="Retirer">✕</button>`:''}</figure>`).join('')}</div>`:'<p class="small muted" style="margin:0">Joignez un planning d\'occupation, un plan ou une photo : toute l\'équipe le verra sur l\'ordre de mission.</p>'}
+  ${up?`<div class="omadd"><input id="om-leg" placeholder="Légende (facultatif) : ex. Planning du week-end" aria-label="Légende de la photo"><label class="shoot" for="om-cam">${ic('camera')}<span>Photo ou image</span><input type="file" id="om-cam" accept="image/*" multiple data-omshoot="${esc(m.id)}"></label></div>`:''}
+  ${S.uploading?'<p class="small muted" style="margin:0">Envoi en cours…</p>':''}`}
+function omRefreshPhotos(){const m=S.missions.find(x=>x.id===S.drawer?.id);if(m&&$('omphotos'))$('omphotos').innerHTML=omPhotosHTML(m)}
+async function omAjouterPhotos(id,L){const m=S.missions.find(x=>x.id===id);if(!m||!L.length)return;const leg=($('om-leg')||{}).value?.trim()||'';S.uploading++;omRefreshPhotos();
+  try{const arr=[...(m.photos||[])];for(const f of L){const up=await uploadPhoto(f);arr.push({...up,legende:leg,le:new Date().toISOString(),par:S.myId})}
+    const now=new Date().toISOString(),j=[...(m.journal||[]),{le:now,par:S.myId,txt:(L.length>1?L.length+' images ajoutées':'Image ajoutée')+(leg?' : '+leg:'')}];
+    await S.db.collection('missions').doc(id).update({photos:arr,journal:j,majLe:now,majPar:S.myId});Object.assign(m,{photos:arr,journal:j});toast(L.length>1?'Images ajoutées':'Image ajoutée')}
+  catch(e){toast(photoErr(e))}finally{S.uploading--;omRefreshPhotos()}}
+async function omRetirerPhoto(k){const m=S.missions.find(x=>x.id===S.drawer?.id);if(!m)return;if(!confirm('Retirer cette image de l\'ordre de mission ?'))return;
+  const arr=(m.photos||[]).filter((_,i)=>i!==k),now=new Date().toISOString();
+  try{await S.db.collection('missions').doc(m.id).update({photos:arr,majLe:now,majPar:S.myId});m.photos=arr;omRefreshPhotos()}catch(e){toast(errMsg(e))}}
+function omZoom(k){const m=S.missions.find(x=>x.id===S.drawer?.id);const p=(m?.photos||[])[k];if(!p)return;
+  const box=document.createElement('div');box.className='lightbox';box.id='lightbox';box.setAttribute('role','dialog');box.setAttribute('aria-label','Image');
+  box.innerHTML=`${pimg(p,'alt="Image jointe"')}<p class="num">${esc(p.legende||'Image jointe')} · ${fr(p.le)} · ${esc(who(p.par))}</p><button type="button" data-unzoom="1">Fermer</button>`;
+  document.body.appendChild(box)}
+async function omPhotoData(p){try{if(p.ref){if(!S.photoCache[p.ref]){const d=await S.db.collection('photos').doc(p.ref).get();if(d.exists)S.photoCache[p.ref]=d.data().d}return S.photoCache[p.ref]||''}
+  if(p.id){const b=await (await fetch('/_blob/'+p.id)).blob();return await new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result);f.onerror=()=>r('');f.readAsDataURL(b)})}}catch(e){}return ''}
+function omImgSize(d){return new Promise(r=>{const im=new Image();im.onload=()=>r({w:im.naturalWidth,h:im.naturalHeight});im.onerror=()=>r(null);im.src=d})}
 function plJourneeHTML(){if(!plVoit())return '';const iso=today();const B=PL_SITES.map(x=>({x,L:plDuJour(x.id,iso)})).filter(b=>b.L.length);if(!B.length)return '';
   return `<section class="ep-b"><h3>Équipes aujourd'hui</h3>${B.map(({x,L})=>`<a class="ep-l" href="./?seul=planning#planning" style="text-decoration:none;color:inherit"><span class="ep-ic">${ic('users')}</span><span class="ep-tx"><b>${esc(x.court)} : ${L.length} présent${L.length>1?'s':''}</b><small>${L.map(({p,c})=>esc((p.nom||'?').split(' ')[0])+' '+plH(c.debut)+'–'+plH(c.fin)).join(' · ')}</small></span>${ic('chev')}</a>`).join('')}</section>`}
 function renderRessources(){const ok=v=>VIEWS.includes(v)&&!ecranCache(v)&&navItems().some(x=>x.v===v);
@@ -4886,6 +4910,7 @@ function openMission(id){
       <button type="button" class="cur" data-omstat="en_cours" aria-pressed="${st==='en_cours'}" ${ro?'disabled':''}>${ic('repeat')}En cours</button>
       <button type="button" class="ko" data-omstat="probleme" aria-pressed="${st==='probleme'}" ${ro?'disabled':''}>${ic('alert')}Problème</button></div>
       ${ro?'':`<label class="f">Compte rendu ou problème rencontré<textarea id="om-note" placeholder="Ex. Tonte faite sauf le terrain 2, tondeuse en panne">${esc(m.recur?(sj.note||''):(m.compteRendu||''))}</textarea></label>`}</section>`:`<p class="small muted" style="margin:0">Pas de passage prévu aujourd'hui pour cette mission.</p>`}
+    <section class="sec" style="gap:8px"><h4>Photos et documents</h4><div id="omphotos">${omPhotosHTML(m)}</div></section>
     <section class="sec" style="gap:10px"><h4>Historique</h4><ul class="journal">${journalHTML(m)}</ul></section>
     ${S.sup||m.creePar===S.myId?`<div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><span id="delZone"><button type="button" class="danger" data-del="om">Supprimer</button></span><span style="display:flex;gap:8px;flex-wrap:wrap">${m.statut!=='annule'?'<button type="button" data-omcancel="1">Annuler la mission</button>':''}<button type="button" data-omedit="${esc(m.id)}">Modifier</button></span></div>`:''}`;
   shell({icon:`<span class="mt" style="--dc:${t.c}">${ic(t.i)}</span>`,kicker:esc(m.num||'')+' · '+esc(t.nom),title:m.titre,body,foot:`<button type="button" data-ompdf="${esc(m.id)}">${ic('pdf')}Fiche PDF</button>${on&&!ro?`<button type="button" class="primary" data-omsave="1">Enregistrer le compte rendu</button>`:''}`});
@@ -4968,6 +4993,10 @@ async function omPDF(id){
   const cr=m.recur?((m.suivi||{})[today()]?.note||''):(m.compteRendu||'');if(cr)doc.text(doc.splitTextToSize(cr,W-34),17,y+9);
   y+=38;doc.setFontSize(10);doc.text('Le donneur d\'ordre',14,y);doc.text('L\'agent / le responsable',120,y);doc.line(14,y+16,90,y+16);doc.line(120,y+16,196,y+16);
   doc.setFontSize(8);doc.setTextColor(83,98,106);doc.text(`Maintenance & Interventions · Secteur Est · ${m.num||''} · édité le ${fr(today())}`,14,290);
+  for(const p of (m.photos||[])){const d=await omPhotoData(p);if(!d)continue;const z=await omImgSize(d);if(!z)continue;
+    doc.addPage();doc.setFont('helvetica','bold');doc.setFontSize(12);doc.setTextColor(19,33,42);doc.text(doc.splitTextToSize((p.legende||'Pièce jointe')+' · '+(m.num||''),W-28),14,18);
+    const mw=W-28,mh=297-44;let w=mw,h=w*z.h/z.w;if(h>mh){h=mh;w=h*z.w/z.h}doc.addImage(d,'JPEG',14+(mw-w)/2,28,w,h);
+    doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(83,98,106);doc.text(`Maintenance & Interventions · Secteur Est · ${m.num||''} · édité le ${fr(today())}`,14,290)}
   await saveFile(`${m.num||'ordre-de-mission'}.pdf`,doc.output('arraybuffer'));
 }
 
@@ -5908,6 +5937,8 @@ document.addEventListener('click',e=>{
   if(ds.copyatal){copyAtal();return}
   if(ds.copydatal){copyDAtal();return}
   if(ds.zoom!==undefined){zoom(+ds.zoom);return}
+  if(ds.omzoom!==undefined){omZoom(+ds.omzoom);return}
+  if(ds.omrmphoto!==undefined){omRetirerPhoto(+ds.omrmphoto);return}
   if(ds.unzoom){$('lightbox')?.remove();return}
   if(ds.rmphoto!==undefined){removePhoto(+ds.rmphoto);return}
   if(ds.save){({ps:savePassage,pr:savePret,dg:saveDeg,ctc:saveContact,ag:saveAgenda,eq:()=>saveEquip(false),neweq:()=>saveEquip(true),cle:saveKey,newcle:saveNewKeys,bt:saveBT,dem:saveDemande,manif:saveManif,point:savePoint})[ds.save]?.();return}
@@ -5947,6 +5978,7 @@ document.addEventListener('change',async e=>{
   if(ds.qrphoto){const f=t.files&&t.files[0];t.value='';if(f)secuPhotoQR(f);return}
   if(ds.secphoto){const f=t.files&&t.files[0];t.value='';if(f)secuPhoto(f);return}
   if(ds.wshoot){const f=t.files&&t.files[0];t.value='';wizPhoto(f);return}
+  if(ds.omshoot){const L=[...(t.files||[])];t.value='';omAjouterPhotos(ds.omshoot,L);return}
   if(ds.shoot){const L=[...(t.files||[])];t.value='';(async()=>{for(const f of L)await addPhoto(ds.shoot,f)})();return}
   if(ds.paashoot){const L=[...(t.files||[])];t.value='';paaAjouter(ds.paashoot,L);return}
   if(ds.mcheck!==undefined){S.drawer.data.besoins[+ds.mcheck].fait=t.checked;t.nextElementSibling.className=t.checked?'done':'';return}
